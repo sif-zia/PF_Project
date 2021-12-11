@@ -46,7 +46,9 @@ int main() {
         DrawBorder();
 
         myRect(x, y, x + 50, y + 50, 255, 0, 255);
+
         key_pressed = isCursorKeyPressed(keyboard_key);
+
         if (key_pressed == true && keyboard_key == 1)
             MoveRectLeft(x, y);
         else if (key_pressed == true && keyboard_key == 2)
