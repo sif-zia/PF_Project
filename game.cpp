@@ -57,6 +57,6 @@ int main() {
             MoveRectDown(x, y);
 
     }
-    system("cls");
+    cin.get();
     return 0;
 }
