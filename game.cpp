@@ -3,10 +3,10 @@
 using namespace std;
 
 void DrawBorder() {
-    myLine(50, 50, 18 * 50, 50, 255);
-    myLine(18 * 50, 50, 18 * 50, 8 * 50, 255);
-    myLine(18 * 50, 8 * 50, 50, 8 * 50, 255);
-    myLine(50, 8 * 50, 50, 50, 255);
+    myLine(50, 50, 900, 50, 255);
+    myLine(900, 50, 900, 400, 255);
+    myLine(900, 400, 50, 400, 255);
+    myLine(50, 400, 50, 50, 255);
 }
 
 void MoveRectLeft(int& x, int& y) {
