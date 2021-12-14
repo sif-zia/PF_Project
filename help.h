@@ -12,13 +12,13 @@ void gotoxy(int x, int y)
 
 }
 
-void myLine(int x1, int y1, int x2, int y2, int color) //use three 3 integers if you want colored lines.
+void myLine(int x1, int y1, int x2, int y2, int R, int G = 255, int B = 255) //use three 3 integers if you want colored lines.
 {
 	HWND console_handle = GetConsoleWindow();
 	HDC device_context = GetDC(console_handle);
 
 	//change the color by changing the values in RGB (from 0-255) to get shades of gray. For other colors use 3 integers for colors.
-	HPEN pen = CreatePen(PS_SOLID, 2, RGB(color, color, color)); //2 is the width of the pen
+	HPEN pen = CreatePen(PS_SOLID, 2, RGB(R, G, B)); //2 is the width of the pen
 	SelectObject(device_context, pen);
 	MoveToEx(device_context, x1, y1, NULL);
 	LineTo(device_context, x2, y2);
