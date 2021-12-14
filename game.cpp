@@ -2,28 +2,20 @@
 #include "help.h"
 using namespace std;
 
-void DrawBorder() {
+void DrawGrid() {
     //Border
     myLine(50, 50, 610, 50, 255);
     myLine(610, 50, 610, 610, 255);
     myLine(610, 610, 50, 610, 255);
     myLine(50, 610, 50, 50, 255);
+
     //Vertical lines
-    myLine(120, 50, 120, 610, 255);
-    myLine(190, 50, 190, 610, 255);
-    myLine(260, 50, 260, 610, 255);
-    myLine(330, 50, 330, 610, 255);
-    myLine(400, 50, 400, 610, 255);
-    myLine(470, 50, 470, 610, 255);
-    myLine(540, 50, 540, 610, 255);
+    for(int x = 120; x <= 540; x += 70)
+        myLine(x, 50, x, 610, 255);
+    
     //Horizontal lines
-    myLine(50, 120, 610, 120, 255);
-    myLine(50, 190, 610, 190, 255);
-    myLine(50, 260, 610, 260, 255);
-    myLine(50, 330, 610, 330, 255);
-    myLine(50, 400, 610, 400, 255);
-    myLine(50, 470, 610, 470, 255);
-    myLine(50, 540, 610, 540, 255);
+    for (int y = 120; y <= 540; y += 70)
+        myLine(50, y, 610, y, 255);
 }
 
 
@@ -65,9 +57,10 @@ int main() {
 
 
     while (1) {
-        DrawBorder();
+        DrawGrid();
 
         myRect(x, y, x + 70, y + 70, 255, 0, 255);
+        Sleep(50);
 
         key_pressed = isCursorKeyPressed(keyboard_key);
 
