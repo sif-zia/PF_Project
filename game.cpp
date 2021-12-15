@@ -20,24 +20,14 @@ void DrawGrid() {
         myLine(50, y, 610, y, 255);
 }
 
-void EmptyCells() {
-    int size = 20;
+void EmptyCells(int cells[8][8]) {
 
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
-            int mid_x = (100 + 70 * (2 * i + 1)) / 2;
-            int mid_y = (100 + 70 * (2 * j + 1)) / 2;
-            myRect(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 0, 0, 0);
+            cells[i][j] = 0;
         }
     }
 
-}
-
-void randomizer(int cells[8][8]) {
-    EmptyCells();
-    for (int i = 0; i < 8; i++)
-        for (int j = 0; j < 8; j++)
-            cells[i][j] = (rand() % 5) + 1;
 }
 
 void DrawGems(int cells[8][8]) {
@@ -47,17 +37,25 @@ void DrawGems(int cells[8][8]) {
         for (int j = 0; j < 8; j++) {
             int mid_x = (100 + 70 * (2 * i + 1)) / 2;
             int mid_y = (100 + 70 * (2 * j + 1)) / 2;
+            // Black box or Empty cell is printed for 0
+            if(cells[i][j] == 0)
+                myRect(mid_x - (size + 3), mid_y - (size + 3), mid_x + (size + 3), mid_y + (size + 3), 0, 0, 0);
+            // Circle is drawn for 1
             if (cells[i][j] == 1)
                 myEllipse(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 255, 0, 255);
+            // Triangle is drawn for 2
             else if (cells[i][j] == 2) {
                 myLine(mid_x, mid_y - size, mid_x + size, mid_y + size, 0, 0, 255);
                 myLine(mid_x + size, mid_y + size, mid_x - size, mid_y + size, 0, 0, 255);
                 myLine(mid_x - size, mid_y + size, mid_x, mid_y - size, 0, 0, 255);
             }
+            // Ellipse is drawn for 3
             else if (cells[i][j] == 3)
                 myEllipse(mid_x - size/2, mid_y - size, mid_x + size/2, mid_y + size, 255, 255, 0);
+            // Square is drawn for 4
             else if (cells[i][j] == 4)
                 myRect(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 0, 255, 255);
+            // Cross is drawn for 5
             else if (cells[i][j] == 5) {
                 myLine(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 0, 255, 0);
                 myLine(mid_x - size, mid_y + size, mid_x + size, mid_y - size, 0, 255, 0);
@@ -65,6 +63,14 @@ void DrawGems(int cells[8][8]) {
         }
     }
     
+}
+
+void randomizer(int cells[8][8]) {
+    EmptyCells(cells);
+    DrawGems(cells);
+    for (int i = 0; i < 8; i++)
+        for (int j = 0; j < 8; j++)
+            cells[i][j] = (rand() % 5) + 1;
 }
 
 void MoveSelectorLeft(int& x, int& y) {
@@ -101,7 +107,7 @@ int main() {
 
     int keyboard_key;
     bool key_pressed;
-    int x = 50, y = 50;
+    int x = 50, y = 50, cell_x = 0, cell_y = 0;
 
     system("@echo off");
     system("mode 800");
