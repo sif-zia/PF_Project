@@ -5,18 +5,13 @@
 using namespace std;
 
 void DrawGrid() {
-    //Border
-    myLine(50, 50, 610, 50, 255);
-    myLine(610, 50, 610, 610, 255);
-    myLine(610, 610, 50, 610, 255);
-    myLine(50, 610, 50, 50, 255);
 
     //Vertical lines
-    for(int x = 120; x <= 540; x += 70)
+    for(int x = 50; x <= 610; x += 70)
         myLine(x, 50, x, 610, 255);
     
     //Horizontal lines
-    for (int y = 120; y <= 540; y += 70)
+    for (int y = 50; y <= 610; y += 70)
         myLine(50, y, 610, y, 255);
 }
 
@@ -104,15 +99,13 @@ void selection(int cells[8][8], int cell_x, int cell_y, int& selected_x, int& se
         gem(0, selected_x, selected_y);
         gem(0, cell_x, cell_y);
         swap(cells[selected_x][selected_y], cells[cell_x][cell_y]);
-        selected_x = -1;
-        selected_y = -1;
         is_selected = false;
     }
     else if (is_selected == true && enter == true && shouldSwap == false) {
         selected_x = cell_x;
         selected_y = cell_y;
     }
-    if (selected_x != -1) {
+    if (is_selected == true) {
         int x = 50 + selected_x * (70);
         int y = 50 + selected_y * (70);
         myRect(x, y, x + 70, y + 70, 0, 255, 0);
