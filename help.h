@@ -69,6 +69,13 @@ bool isCursorKeyPressed(int& whichKey)   //whichKey passed as reference....
 		whichKey = 5;   // 5 if enter key is pressed
 		return true;
 	}
+	key = GetAsyncKeyState(16);
+	if (key == 1)
+	{
+
+		whichKey = 6;   // 6 if shift key is pressed
+		return true;
+	}
 	return false;
 }
 

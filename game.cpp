@@ -30,36 +30,42 @@ void EmptyCells(int cells[8][8]) {
 
 }
 
-void DrawGems(int cells[8][8]) {
+void gem(int cell, int i, int j) {
+
     int size = 15;
+
+    int mid_x = (100 + 70 * (2 * i + 1)) / 2;
+    int mid_y = (100 + 70 * (2 * j + 1)) / 2;
+    // Black box or Empty cell is printed for 0
+    if (cell == 0)
+        myRect(mid_x - (size + 3), mid_y - (size + 3), mid_x + (size + 3), mid_y + (size + 3), 0, 0, 0);
+    // Circle is drawn for 1
+    if (cell == 1)
+        myEllipse(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 255, 0, 255);
+    // Triangle is drawn for 2
+    else if (cell == 2) {
+        myLine(mid_x, mid_y - size, mid_x + size, mid_y + size, 0, 0, 255);
+        myLine(mid_x + size, mid_y + size, mid_x - size, mid_y + size, 0, 0, 255);
+        myLine(mid_x - size, mid_y + size, mid_x, mid_y - size, 0, 0, 255);
+    }
+    // Ellipse is drawn for 3
+    else if (cell == 3)
+        myEllipse(mid_x - size / 2, mid_y - size, mid_x + size / 2, mid_y + size, 255, 255, 0);
+    // Square is drawn for 4
+    else if (cell == 4)
+        myRect(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 0, 255, 255);
+    // Cross is drawn for 5
+    else if (cell == 5) {
+        myLine(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 0, 255, 0);
+        myLine(mid_x - size, mid_y + size, mid_x + size, mid_y - size, 0, 255, 0);
+    }
+}
+
+void DrawGems(int cells[8][8]) {
 
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
-            int mid_x = (100 + 70 * (2 * i + 1)) / 2;
-            int mid_y = (100 + 70 * (2 * j + 1)) / 2;
-            // Black box or Empty cell is printed for 0
-            if(cells[i][j] == 0)
-                myRect(mid_x - (size + 3), mid_y - (size + 3), mid_x + (size + 3), mid_y + (size + 3), 0, 0, 0);
-            // Circle is drawn for 1
-            if (cells[i][j] == 1)
-                myEllipse(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 255, 0, 255);
-            // Triangle is drawn for 2
-            else if (cells[i][j] == 2) {
-                myLine(mid_x, mid_y - size, mid_x + size, mid_y + size, 0, 0, 255);
-                myLine(mid_x + size, mid_y + size, mid_x - size, mid_y + size, 0, 0, 255);
-                myLine(mid_x - size, mid_y + size, mid_x, mid_y - size, 0, 0, 255);
-            }
-            // Ellipse is drawn for 3
-            else if (cells[i][j] == 3)
-                myEllipse(mid_x - size/2, mid_y - size, mid_x + size/2, mid_y + size, 255, 255, 0);
-            // Square is drawn for 4
-            else if (cells[i][j] == 4)
-                myRect(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 0, 255, 255);
-            // Cross is drawn for 5
-            else if (cells[i][j] == 5) {
-                myLine(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 0, 255, 0);
-                myLine(mid_x - size, mid_y + size, mid_x + size, mid_y - size, 0, 255, 0);
-            }
+            gem(cells[i][j], i, j);
         }
     }
     
@@ -73,30 +79,75 @@ void randomizer(int cells[8][8]) {
             cells[i][j] = (rand() % 5) + 1;
 }
 
-void MoveSelectorLeft(int& x, int& y) {
+bool isNeighbour(int selected_x, int selected_y, int cell_x, int cell_y) {
+    bool flag = false;
+    if ((selected_x - cell_x == 1) && (selected_y == cell_y))
+        flag = true;
+    else if ((cell_x - selected_x == 1) && (selected_y == cell_y))
+        flag = true;
+    else if ((cell_y - selected_y == 1) && (selected_x == cell_x))
+        flag = true;
+    else if ((selected_y - cell_y == 1) && (selected_x == cell_x))
+        flag = true;
+    return flag;
+}
+
+void selection(int cells[8][8], int cell_x, int cell_y, int& selected_x, int& selected_y, bool& is_selected, bool enter = false) {
+    bool shouldSwap = isNeighbour(selected_x, selected_y, cell_x, cell_y);
+
+    if (is_selected == false && enter == true) {
+        selected_x = cell_x;
+        selected_y = cell_y;
+        is_selected = true;
+    }
+    else if (is_selected == true && enter == true && shouldSwap == true) {
+        gem(0, selected_x, selected_y);
+        gem(0, cell_x, cell_y);
+        swap(cells[selected_x][selected_y], cells[cell_x][cell_y]);
+        selected_x = -1;
+        selected_y = -1;
+        is_selected = false;
+    }
+    else if (is_selected == true && enter == true && shouldSwap == false) {
+        selected_x = cell_x;
+        selected_y = cell_y;
+    }
+    if (selected_x != -1) {
+        int x = 50 + selected_x * (70);
+        int y = 50 + selected_y * (70);
+        myRect(x, y, x + 70, y + 70, 0, 255, 0);
+    }
+
+}
+
+void MoveSelectorLeft(int& x, int& y, int& cell_x, int& cell_y) {
     if (x != 50) {
         myRect(x, y, x + 70, y + 70, 255, 255, 255);
+        cell_x--;
         x -= 70;
     }
 }
 
-void MoveSelectorRight(int& x, int& y) {
+void MoveSelectorRight(int& x, int& y, int& cell_x, int& cell_y) {
     if (x + 70 != 610) {
         myRect(x, y, x + 70, y + 70, 255, 255, 255);
+        cell_x++;
         x += 70;
     }
 }
 
-void MoveSelectorUp(int& x, int& y) {
+void MoveSelectorUp(int& x, int& y, int& cell_x, int& cell_y) {
     if (y != 50) {
         myRect(x, y, x + 70, y + 70, 255, 255, 255);
+        cell_y--;
         y -= 70;
     }
 }
 
-void MoveSelectorDown(int& x, int& y) {
+void MoveSelectorDown(int& x, int& y, int& cell_x, int& cell_y) {
     if (y + 70 != 610) {
         myRect(x, y, x + 70, y + 70, 255, 255, 255);
+        cell_y++;
         y += 70;
     }
 }
@@ -106,8 +157,8 @@ int main() {
     srand(time(0));
 
     int keyboard_key;
-    bool key_pressed;
-    int x = 50, y = 50, cell_x = 0, cell_y = 0;
+    bool key_pressed, is_selected = false;
+    int x = 50, y = 50, cell_x = 0, cell_y = 0, selected_x = -1, selected_y = -1;
 
     system("@echo off");
     system("mode 800");
@@ -128,32 +179,45 @@ int main() {
         
 
         if (key_pressed == true && keyboard_key == 1) {
-            MoveSelectorLeft(x, y);
+            MoveSelectorLeft(x, y, cell_x, cell_y);
             DrawGrid();
+            selection(cells, cell_x, cell_y, selected_x, selected_y, is_selected);
             myRect(x, y, x + 70, y + 70, 255, 0, 0);
             DrawGems(cells);
+            //gem(cells, cell_x, cell_y);
+            //gem(cells, cell_x+1, cell_y);
         }
         else if (key_pressed == true && keyboard_key == 2) {
-            MoveSelectorUp(x, y);
+            MoveSelectorUp(x, y, cell_x, cell_y);
             DrawGrid();
+            selection(cells, cell_x, cell_y, selected_x, selected_y, is_selected);
             myRect(x, y, x + 70, y + 70, 255, 0, 0);
             DrawGems(cells);
         }
         else if (key_pressed == true && keyboard_key == 3) {
-            MoveSelectorRight(x, y);
+            MoveSelectorRight(x, y, cell_x, cell_y);
             DrawGrid();
+            selection(cells, cell_x, cell_y, selected_x, selected_y, is_selected);
             myRect(x, y, x + 70, y + 70, 255, 0, 0);
             DrawGems(cells);
         }
         else if (key_pressed == true && keyboard_key == 4) {
-            MoveSelectorDown(x, y);
+            MoveSelectorDown(x, y, cell_x, cell_y);
             DrawGrid();
+            selection(cells, cell_x, cell_y, selected_x, selected_y, is_selected);
             myRect(x, y, x + 70, y + 70, 255, 0, 0);
             DrawGems(cells);
         }
         else if (key_pressed == true && keyboard_key == 5) {
+            DrawGrid();
+            selection(cells, cell_x, cell_y, selected_x, selected_y, is_selected, true);
+            myRect(x, y, x + 70, y + 70, 255, 0, 0);
+            DrawGems(cells);
+        }
+        else if (key_pressed == true && keyboard_key == 6) {
             randomizer(cells);
             DrawGrid();
+            selection(cells, cell_x, cell_y, selected_x, selected_y, is_selected);
             myRect(x, y, x + 70, y + 70, 255, 0, 0);
             DrawGems(cells);
         }
