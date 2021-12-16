@@ -94,6 +94,10 @@ bool isNeighbour(int selected_x, int selected_y, int cell_x, int cell_y) {
     return flag;
 }
 
+bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y, int  cell_x, int cell_y) {
+    return true;
+}
+
 void selection(int cells[cell_no][cell_no], int cell_x, int cell_y, int& selected_x, int& selected_y, bool& is_selected, bool enter = false) {
     bool shouldSwap = isNeighbour(selected_x, selected_y, cell_x, cell_y);
 
@@ -103,19 +107,20 @@ void selection(int cells[cell_no][cell_no], int cell_x, int cell_y, int& selecte
         is_selected = true;
     }
     else if (is_selected == true && enter == true && shouldSwap == true) {
-        gem(0, selected_x, selected_y);
-        gem(0, cell_x, cell_y);
-        swap(cells[selected_x][selected_y], cells[cell_x][cell_y]);
+            gem(0, selected_x, selected_y);
+            gem(0, cell_x, cell_y);
+            swap(cells[selected_x][selected_y], cells[cell_x][cell_y]);
         is_selected = false;
     }
     else if (is_selected == true && enter == true && shouldSwap == false) {
         selected_x = cell_x;
         selected_y = cell_y;
     }
+
     if (is_selected == true) {
-        int x = start_x + selected_x * (cell_size);
-        int y = start_y + selected_y * (cell_size);
-        myRect(x, y, x + cell_size, y + cell_size, 0, 255, 0);
+        int green_x = start_x + selected_x * (cell_size);
+        int green_y = start_y + selected_y * (cell_size);
+        myRect(green_x, green_y, green_x + cell_size, green_y + cell_size, 0, 255, 0);
     }
 
 }
@@ -175,7 +180,6 @@ int main() {
     while (1) {
 
         key_pressed = isCursorKeyPressed(keyboard_key);
-        
         
 
         if (key_pressed == true && keyboard_key == 1) {
