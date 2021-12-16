@@ -95,7 +95,81 @@ bool isNeighbour(int selected_x, int selected_y, int cell_x, int cell_y) {
 }
 
 bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y, int  cell_x, int cell_y) {
-    return true;
+    int count = 1;
+    bool shouldSwap = false;
+    swap(cells[selected_x][selected_y], cells[cell_x][cell_y]);
+    if (selected_y == cell_y) {
+        // Checking Row for atleast three consecutive duplicates
+        for (int i = 1; i < cell_no; i++) {
+            if (cells[i][cell_y] == cells[i - 1][cell_y]) {
+                count++;
+                if (count == 3)
+                    shouldSwap = true;
+            }
+            else
+                count = 1;
+        }
+        count = 1;
+        // Checking Column Cell_x for atleast three consecutive duplicates
+        for (int i = 1; i < cell_no; i++){
+            if (cells[cell_x][i] == cells[cell_x][i - 1]) {
+                count++;
+                if (count == 3)
+                    shouldSwap = true;
+            }
+            else
+                count = 1;
+        }
+        count = 1;
+        // Checking Column selected_x for atleast three consecutive duplicates
+        for (int i = 1; i < cell_no; i++) {
+            if (cells[selected_x][i] == cells[selected_x][i - 1]) {
+                count++;
+                if (count >= 3)
+                    shouldSwap = true;
+            }
+            else
+                count = 1;
+        }
+
+    }
+    else if (selected_x == cell_x) {
+        // Checking Row for atleast three consecutive duplicates
+        for (int j = 1; j < cell_no; j++) {
+            if (cells[cell_x][j] == cells[cell_x][j - 1]) {
+                count++;
+                if (count >= 3)
+                    shouldSwap = true;
+            }
+            else
+                count = 1;
+        }
+        
+        count = 1;
+        // Checking cell_y column for atleast three consecutive duplicates
+        for (int j = 1; j < cell_no; j++) {
+            if (cells[j][cell_y] == cells[j - 1][cell_y]) {
+                count++;
+                if (count >= 3)
+                    shouldSwap = true;
+            }
+            else
+                count = 1;
+        }
+        count = 1;
+        // Checking selected_y column for atleast three consecutive duplicates
+        for (int j = 1; j < cell_no; j++) {
+            if (cells[j][selected_y] == cells[j - 1][selected_y]) {
+                count++;
+                if (count >= 3)
+                    shouldSwap = true;
+            }
+            else
+                count = 1;
+        }
+    }
+    swap(cells[selected_x][selected_y], cells[cell_x][cell_y]);
+    return shouldSwap;
 }
 
 void selection(int cells[cell_no][cell_no], int cell_x, int cell_y, int& selected_x, int& selected_y, bool& is_selected, bool enter = false) {
@@ -107,9 +181,11 @@ void selection(int cells[cell_no][cell_no], int cell_x, int cell_y, int& selecte
         is_selected = true;
     }
     else if (is_selected == true && enter == true && shouldSwap == true) {
+        if (isSwappingLegal(cells, selected_x, selected_y, cell_x, cell_y) == true) {
             gem(0, selected_x, selected_y);
             gem(0, cell_x, cell_y);
             swap(cells[selected_x][selected_y], cells[cell_x][cell_y]);
+        }
         is_selected = false;
     }
     else if (is_selected == true && enter == true && shouldSwap == false) {
