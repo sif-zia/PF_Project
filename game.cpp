@@ -191,9 +191,30 @@ void deleteRowDuplicate(int cells[cell_no][cell_no], int row_no) {
     }
 }
 
+void deleteColDuplicate(int cells[cell_no][cell_no], int col_no) {
+    int count = 1;
+    for (int y = 1; y < cell_no; y++) {
+        if (cells[col_no][y] == cells[col_no][y-1] && cells[col_no][y] != 0) {
+            count++;
+            if (count == 3) {
+                gem(0, col_no, y);
+                cells[col_no][y] = 0;
+                gem(0, col_no, y-1);
+                cells[col_no][y-1] = 0;
+                gem(0, col_no, y-2);
+                cells[col_no][y-2] = 0;
+            }
+        }
+        else
+            count = 1;
+    }
+}
+
 void deleteDuplicates(int cells[cell_no][cell_no]) {
     for (int row = 0; row < cell_no; row++)
         deleteRowDuplicate(cells, row);
+    for (int col = 0; col < cell_no; col++)
+        deleteColDuplicate(cells, col);
 }
 
 void selection(int cells[cell_no][cell_no], int cell_x, int cell_y, int& selected_x, int& selected_y, bool& is_selected, bool enter = false) {
