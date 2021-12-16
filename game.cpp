@@ -134,7 +134,7 @@ bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y
 
     }
     else if (selected_x == cell_x) {
-        // Checking Row for atleast three consecutive duplicates
+        // Checking column for atleast three consecutive duplicates
         for (int j = 1; j < cell_no; j++) {
             if (cells[cell_x][j] == cells[cell_x][j - 1]) {
                 count++;
@@ -146,7 +146,7 @@ bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y
         }
         
         count = 1;
-        // Checking cell_y column for atleast three consecutive duplicates
+        // Checking cell_y row for atleast three consecutive duplicates
         for (int j = 1; j < cell_no; j++) {
             if (cells[j][cell_y] == cells[j - 1][cell_y]) {
                 count++;
@@ -157,7 +157,7 @@ bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y
                 count = 1;
         }
         count = 1;
-        // Checking selected_y column for atleast three consecutive duplicates
+        // Checking selected_y row for atleast three consecutive duplicates
         for (int j = 1; j < cell_no; j++) {
             if (cells[j][selected_y] == cells[j - 1][selected_y]) {
                 count++;
@@ -170,6 +170,30 @@ bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y
     }
     swap(cells[selected_x][selected_y], cells[cell_x][cell_y]);
     return shouldSwap;
+}
+
+void deleteRowDuplicate(int cells[cell_no][cell_no], int row_no) {
+    int count = 1;
+    for (int x = 1; x < cell_no; x++) {
+        if (cells[x][row_no] == cells[x-1][row_no] && cells[x][row_no] != 0) {
+            count++;
+            if (count == 3) {
+                gem(0, x, row_no);
+                cells[x][row_no] = 0;
+                gem(0, x-1, row_no);
+                cells[x-1][row_no] = 0;
+                gem(0, x-2, row_no);
+                cells[x-2][row_no] = 0;
+            }
+        }
+        else
+            count = 1;
+    }
+}
+
+void deleteDuplicates(int cells[cell_no][cell_no]) {
+    for (int row = 0; row < cell_no; row++)
+        deleteRowDuplicate(cells, row);
 }
 
 void selection(int cells[cell_no][cell_no], int cell_x, int cell_y, int& selected_x, int& selected_y, bool& is_selected, bool enter = false) {
@@ -255,6 +279,7 @@ int main() {
 
     while (1) {
 
+        deleteDuplicates(cells);
         key_pressed = isCursorKeyPressed(keyboard_key);
         
 
