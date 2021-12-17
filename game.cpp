@@ -79,7 +79,11 @@ void randomizer(int cells[cell_no][cell_no]) {
     DrawGems(cells);
     for (int i = 0; i < cell_no; i++)
         for (int j = 0; j < cell_no; j++)
-            cells[i][j] = (rand() % 5) + 1;
+            while ((i != 0 && cells[i][j] == cells[i - 1][j]) 
+                || (j != 0 && cells[i][j] == cells[i][j - 1])
+                || (i != cell_no - 1 && cells[i][j] == cells[i+1][j])
+                || (j != cell_no - 1 && cells[i][j] == cells[i][j + 1]))
+                cells[i][j] = (rand() % 5) + 1;
 }
 
 bool isNeighbour(int selected_x, int selected_y, int cell_x, int cell_y) {
@@ -173,6 +177,27 @@ bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y
     return shouldSwap;
 }
 
+void shiftCellsDown(int cells[cell_no][cell_no], int row, int col) {
+    for (int i = col; i >= 1; i--) {
+        gem(0, row, i);
+        cells[row][i] = cells[row][i - 1];
+        gem(cells[row][i], row, i);
+    }
+
+    gem(0, row, 0);
+    cells[row][0] = (rand() % 5) + 1;
+    while (cells[row][0] == cells[row][1] || (cells[row][0] == cells[row - 1][0] && row != 0) || (cells[row][0] == cells[row + 1][0] && row != cell_no - 1))
+        cells[row][0] = (rand() % 5) + 1;
+    gem(cells[row][0], row, 0);
+}
+
+void fillEmptyCells(int cells[cell_no][cell_no]) {
+    for (int row = 0; row < cell_no; row++)
+        for (int col = cell_no - 1; col >= 0; col--)
+            if (cells[row][col] == 0)
+                shiftCellsDown(cells, row, col);
+}
+
 void deleteCell(int cells[cell_no][cell_no], int i, int j) {
     if (cells[i][j] >= 0 && cells[i][j] < 6)
         cells[i][j] = 0;
@@ -239,6 +264,11 @@ void deleteDuplicates(int cells[cell_no][cell_no]) {
         deleteColDuplicate(cells, col);
 }
 
+void updateCells(int cells[cell_no][cell_no]) {
+        deleteDuplicates(cells);
+        fillEmptyCells(cells);
+}
+
 void selection(int cells[cell_no][cell_no], int cell_x, int cell_y, int& selected_x, int& selected_y, bool& is_selected, bool enter = false) {
     bool shouldSwap = isNeighbour(selected_x, selected_y, cell_x, cell_y);
 
@@ -252,6 +282,7 @@ void selection(int cells[cell_no][cell_no], int cell_x, int cell_y, int& selecte
             gem(0, selected_x, selected_y);
             gem(0, cell_x, cell_y);
             swap(cells[selected_x][selected_y], cells[cell_x][cell_y]);
+            updateCells(cells);
         }
         is_selected = false;
     }
@@ -313,6 +344,7 @@ int main() {
 
     int cells[cell_no][cell_no] = {};
 
+
     randomizer(cells);
     DrawGems(cells);
     DrawGrid();
@@ -321,8 +353,7 @@ int main() {
 
 
     while (1) {
-
-        deleteDuplicates(cells);
+        updateCells(cells);
         key_pressed = isCursorKeyPressed(keyboard_key);
         
 
