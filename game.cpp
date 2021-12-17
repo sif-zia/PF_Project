@@ -43,7 +43,7 @@ void gem(int cell, int i, int j) {
     if (cell == 0)
         myRect(mid_x - (size + 3), mid_y - (size + 3), mid_x + (size + 3), mid_y + (size + 3), 0, 0, 0);
     // Circle is drawn for 1
-    if (cell == 1)
+    else if (cell == 1)
         myEllipse(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 255, 0, 255);
     // Triangle is drawn for 2
     else if (cell == 2) {
@@ -61,6 +61,52 @@ void gem(int cell, int i, int j) {
     else if (cell == 5) {
         myLine(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 0, 255, 0);
         myLine(mid_x - size, mid_y + size, mid_x + size, mid_y - size, 0, 255, 0);
+    }
+    // Black box for 6
+    else if (cell == 6)
+        myRect(mid_x - (size + 3), mid_y - (size + 3), mid_x + (size + 3), mid_y + (size + 3), 0, 0, 0);
+    // Concentric Circles ar drawn for 7
+    else if (cell == 7) {
+        myEllipse(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 255, 0, 255);
+        myEllipse(mid_x - size / 2, mid_y - size / 2, mid_x + size / 2, mid_y + size / 2, 255, 0, 255);
+    }
+    // Star is drawn for 8
+    else if (cell == 8) {
+        //downward triangle
+        int y = size / 3;
+        myLine(mid_x - size, mid_y+y - size, mid_x + size, mid_y+y - size, 0, 0, 255);
+        myLine(mid_x + size, mid_y+y - size, mid_x, mid_y+y + size, 0, 0, 255);
+        myLine(mid_x, mid_y+y + size, mid_x - size, mid_y+y - size, 0, 0, 255);
+        // upward triangle
+        myLine(mid_x, mid_y-y - size, mid_x + size, mid_y-y + size, 0, 0, 255);
+        myLine(mid_x + size, mid_y-y + size, mid_x - size, mid_y-y + size, 0, 0, 255);
+        myLine(mid_x - size, mid_y-y + size, mid_x, mid_y-y - size, 0, 0, 255);
+    }
+    //Two perpendicular Ellipses is drawn for 9
+    else if (cell == 9) {
+        // horizontal ellipse
+        myEllipse(mid_x - size, mid_y - size / 2, mid_x + size, mid_y + size / 2, 255, 255, 0);
+        // vertical ellipse
+        myEllipse(mid_x - size / 2, mid_y - size, mid_x + size / 2, mid_y + size, 255, 255, 0);
+    }
+    // Two Squarea are drawn for 10 one tilted and one straight
+    else if (cell == 10) {
+        // Normal square
+        myRect(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 0, 255, 255);
+        // Tilted square
+        myLine(mid_x, mid_y - size, mid_x + size, mid_y, 0, 255, 255);
+        myLine(mid_x + size, mid_y, mid_x, mid_y + size, 0, 255, 255);
+        myLine(mid_x, mid_y + size, mid_x - size, mid_y, 0, 255, 255);
+        myLine(mid_x - size, mid_y, mid_x, mid_y - size, 0, 255, 255);
+    }
+    // Asterik is drawn for 11
+    else if (cell == 11) {
+        //Cross
+        myLine(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 0, 255, 0);
+        myLine(mid_x - size, mid_y + size, mid_x + size, mid_y - size, 0, 255, 0);
+        //Plus
+        myLine(mid_x, mid_y - size, mid_x, mid_y + size, 0, 255, 0);
+        myLine(mid_x - size, mid_y, mid_x + size, mid_y, 0, 255, 0);
     }
 }
 
