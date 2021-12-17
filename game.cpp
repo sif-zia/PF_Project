@@ -173,6 +173,15 @@ bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y
     return shouldSwap;
 }
 
+void deleteCell(int cells[cell_no][cell_no], int i, int j) {
+    if (cells[i][j] >= 0 && cells[i][j] < 6)
+        cells[i][j] = 0;
+    else if (cells[i][j] >= 6 && cells[i][j] < 12)
+        cells[i][j] = 6;
+    else if (cells[i][j] >= 12 && cells[i][j] < 18)
+        cells[i][j] = 12;
+}
+
 void deleteRowDuplicate(int cells[cell_no][cell_no], int row_no) {
     int count = 1;
     for (int y = 1; y < cell_no; y++) {
@@ -182,7 +191,7 @@ void deleteRowDuplicate(int cells[cell_no][cell_no], int row_no) {
             if (count == 3) {
                 for (int i = 1; i <= 3; i++) {
                     gem(0, row_no, y - i);
-                    cells[row_no][y - i] = 0;
+                    deleteCell(cells, row_no, y - i);
                     points += 50;
                 }
             }
@@ -192,7 +201,7 @@ void deleteRowDuplicate(int cells[cell_no][cell_no], int row_no) {
     if (count == 3) {
         for (int i = 1; i <= 3; i++) {
             gem(0, row_no, cell_no - i);
-            cells[row_no][cell_no - i] = 0;
+            deleteCell(cells, row_no, cell_no - i);
             points += 50;
         }
     }
@@ -207,7 +216,7 @@ void deleteColDuplicate(int cells[cell_no][cell_no], int col_no) {
             if (count == 3) {
                 for (int i = 1; i <= 3; i++) {
                     gem(0, x - i, col_no);
-                    cells[x - i][col_no] = 0;
+                    deleteCell(cells, x - i, col_no);
                     points += 50;
                 }
             }
@@ -217,7 +226,7 @@ void deleteColDuplicate(int cells[cell_no][cell_no], int col_no) {
     if (count == 3) {
         for (int i = 1; i <= 3; i++) {
             gem(0, cell_no - i, col_no);
-            cells[cell_no - i][col_no] = 0;
+            deleteCell(cells, cell_no - i, col_no);
             points += 50;
         }
     }
