@@ -174,39 +174,47 @@ bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y
 
 void deleteRowDuplicate(int cells[cell_no][cell_no], int row_no) {
     int count = 1;
-    for (int x = 1; x < cell_no; x++) {
-        if (cells[x][row_no] == cells[x-1][row_no] && cells[x][row_no] != 0) {
+    for (int y = 1; y < cell_no; y++) {
+        if (cells[row_no][y] == cells[row_no][y - 1] && cells[row_no][y] != 0)
             count++;
+        else {
             if (count == 3) {
-                gem(0, x, row_no);
-                cells[x][row_no] = 0;
-                gem(0, x-1, row_no);
-                cells[x-1][row_no] = 0;
-                gem(0, x-2, row_no);
-                cells[x-2][row_no] = 0;
+                for (int i = 1; i <= 3; i++) {
+                    gem(0, row_no, y - i);
+                    cells[row_no][y - i] = 0;
+                }
             }
-        }
-        else
             count = 1;
+        }
+    }
+    if (count == 3) {
+        for (int i = 1; i <= 3; i++) {
+            gem(0, row_no, cell_no - i);
+            cells[row_no][cell_no - i] = 0;
+        }
     }
 }
 
 void deleteColDuplicate(int cells[cell_no][cell_no], int col_no) {
     int count = 1;
-    for (int y = 1; y < cell_no; y++) {
-        if (cells[col_no][y] == cells[col_no][y-1] && cells[col_no][y] != 0) {
+    for (int x = 1; x < cell_no; x++) {
+        if (cells[x][col_no] == cells[x - 1][col_no] && cells[x][col_no] != 0)
             count++;
+        else {
             if (count == 3) {
-                gem(0, col_no, y);
-                cells[col_no][y] = 0;
-                gem(0, col_no, y-1);
-                cells[col_no][y-1] = 0;
-                gem(0, col_no, y-2);
-                cells[col_no][y-2] = 0;
+                for (int i = 1; i <= 3; i++) {
+                    gem(0, x - i, col_no);
+                    cells[x - i][col_no] = 0;
+                }
             }
-        }
-        else
             count = 1;
+        }
+    }
+    if (count == 3) {
+        for (int i = 1; i <= 3; i++) {
+            gem(0, cell_no - i, col_no);
+            cells[cell_no - i][col_no] = 0;
+        }
     }
 }
 
