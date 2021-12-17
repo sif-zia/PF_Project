@@ -178,7 +178,9 @@ bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y
 }
 
 void shiftCellsDown(int cells[cell_no][cell_no], int row, int col) {
+    // Add animation in future
     for (int i = col; i >= 1; i--) {
+        Sleep(100);
         gem(0, row, i);
         cells[row][i] = cells[row][i - 1];
         gem(cells[row][i], row, i);
@@ -282,6 +284,8 @@ void selection(int cells[cell_no][cell_no], int cell_x, int cell_y, int& selecte
             gem(0, selected_x, selected_y);
             gem(0, cell_x, cell_y);
             swap(cells[selected_x][selected_y], cells[cell_x][cell_y]);
+            gem(cells[cell_x][cell_y], cell_x, cell_y);
+            gem(cells[selected_x][selected_y], selected_x, selected_y);
             updateCells(cells);
         }
         is_selected = false;
