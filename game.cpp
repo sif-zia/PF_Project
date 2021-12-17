@@ -10,6 +10,7 @@ int cell_size = 70;
 const int cell_no = 8;
 int end_x = start_x + cell_no * cell_size;
 int end_y = start_y + cell_no * cell_size;
+int points = 0;
 
 void DrawGrid() {
 
@@ -182,6 +183,7 @@ void deleteRowDuplicate(int cells[cell_no][cell_no], int row_no) {
                 for (int i = 1; i <= 3; i++) {
                     gem(0, row_no, y - i);
                     cells[row_no][y - i] = 0;
+                    points += 50;
                 }
             }
             count = 1;
@@ -191,6 +193,7 @@ void deleteRowDuplicate(int cells[cell_no][cell_no], int row_no) {
         for (int i = 1; i <= 3; i++) {
             gem(0, row_no, cell_no - i);
             cells[row_no][cell_no - i] = 0;
+            points += 50;
         }
     }
 }
@@ -205,6 +208,7 @@ void deleteColDuplicate(int cells[cell_no][cell_no], int col_no) {
                 for (int i = 1; i <= 3; i++) {
                     gem(0, x - i, col_no);
                     cells[x - i][col_no] = 0;
+                    points += 50;
                 }
             }
             count = 1;
@@ -214,6 +218,7 @@ void deleteColDuplicate(int cells[cell_no][cell_no], int col_no) {
         for (int i = 1; i <= 3; i++) {
             gem(0, cell_no - i, col_no);
             cells[cell_no - i][col_no] = 0;
+            points += 50;
         }
     }
 }
