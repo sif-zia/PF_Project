@@ -324,18 +324,35 @@ void initiateFlameGem(int cells[cell_no][cell_no], int& pos_x, int& pos_y) {
                 gem(0, i, j);
             }
         }
-    if(pos_x != 0)
+    if (pos_x != 0)
         pos_x--;
     pos_y = cell_no - 1;
 }
 
-void shiftCellsDown(int cells[cell_no][cell_no], int pos_x, int pos_y) {
+void initiateDestroyerGem(int cells[cell_no][cell_no], int& pos_x, int& pos_y) {
+
+    for (int x = 0; x < cell_no; x++) {
+        Sleep(speed / 2);
+        deleteCell(cells, x, pos_y);
+        gem(0, x, pos_y);
+    }
+    for (int y = 0; y < cell_no; y++) {
+        Sleep(speed / 2);
+        deleteCell(cells, pos_x, y);
+        gem(0, pos_x, y);
+    }
+
+    pos_x = 0;
+    pos_y = cell_no - 1;
+}
+
+void shiftGemsDown(int cells[cell_no][cell_no], int pos_x, int pos_y) {
     // Add animation in future
     for (int i = pos_y; i >= 1; i--) {
         Sleep(speed);
         cells[pos_x][i] = cells[pos_x][i - 1];
         gem(cells[pos_x][i], pos_x, i);
-        gem(0, pos_x, i-1);
+        gem(0, pos_x, i - 1);
     }
 
     gem(0, pos_x, 0);
@@ -349,26 +366,92 @@ void fillEmptyCells(int cells[cell_no][cell_no]) {
 
     for (int pos_x = 0; pos_x < cell_no; pos_x++)
         for (int pos_y = cell_no - 1; pos_y >= 0; pos_y--)
+            if (cells[pos_x][pos_y] == 12)
+                initiateDestroyerGem(cells, pos_x, pos_y);
+
+    for (int pos_x = 0; pos_x < cell_no; pos_x++)
+        for (int pos_y = cell_no - 1; pos_y >= 0; pos_y--)
             if (cells[pos_x][pos_y] == 6)
                 initiateFlameGem(cells, pos_x, pos_y);
 
     for (int pos_x = 0; pos_x < cell_no; pos_x++)
         for (int pos_y = cell_no - 1; pos_y >= 0; pos_y--)
             if (cells[pos_x][pos_y] == 0)
-                shiftCellsDown(cells, pos_x, pos_y);
+                shiftGemsDown(cells, pos_x, pos_y);
+}
+
+bool isVerticalElbowFormed(int cells[cell_no][cell_no], int x, int y, int& elbow_x, int& elbow_y) {
+    bool elbowfound = false;
+    for (int i = y; i >= y - 2; i--) {
+        if (areGemsSame(cells[x][i], cells[x + 1][i]) == true && areGemsSame(cells[x + 1][i], cells[x + 2][i]) == true) {
+            elbowfound = true;
+            elbow_x = x;
+            elbow_y = i;
+            deleteCell(cells, x + 1, i);
+            gem(0, x + 1, i);
+            deleteCell(cells, x + 2, i);
+            gem(0, x + 2, i);
+            points += 100;
+        }
+        if (areGemsSame(cells[x][i], cells[x - 1][i]) == true && areGemsSame(cells[x - 1][i], cells[x - 2][i]) == true) {
+            elbowfound = true;
+            elbow_x = x;
+            elbow_y = i;
+            deleteCell(cells, x - 1, i);
+            gem(0, x - 1, i);
+            deleteCell(cells, x - 2, i);
+            gem(0, x - 2, i);
+            points += 100;
+        }
+    }
+    
+    if (areGemsSame(cells[x - 1][y - 2], cells[x][y - 2]) == true && areGemsSame(cells[x][y - 2], cells[x + 1][y - 2]) == true){
+        elbowfound = true;
+        elbow_x = x;
+        elbow_y = y-2;
+        deleteCell(cells, x - 1, y - 2);
+        gem(0, x - 1, y - 2);
+        deleteCell(cells, x + 1, y - 2);
+        gem(0, x + 1, y - 2);
+        points += 100;
+    }
+    if (areGemsSame(cells[x - 1][y - 2], cells[x][y - 2]) == true && areGemsSame(cells[x][y - 2], cells[x + 1][y - 2]) == true){
+        elbowfound = true;
+        elbow_x = x;
+        elbow_y = y;
+        deleteCell(cells, x - 1, y);
+        gem(0, x - 1, y);
+        deleteCell(cells, x + 1, y);
+        gem(0, x + 1, y);
+        points += 100;
+    }
+    return elbowfound;
 }
 
 void deleteColDuplicate(int cells[cell_no][cell_no], int col) {
     int count = 1;
+    int elbow_x, elbow_y;
+    int Gem;
     for (int y = 1; y < cell_no; y++) {
         if (areGemsSame(cells[col][y], cells[col][y - 1]) == true)
             count++;
         else {
             if (count == 3) { // Delete Three Consective Gems in a row
-                for (int i = 1; i <= 3; i++) {
-                    gem(0, col, y - i);
-                    deleteCell(cells, col, y - i);
-                    points += 50;
+                if (isVerticalElbowFormed(cells, col, y - 1, elbow_x, elbow_y) == true) {
+                    Gem = cells[elbow_x][elbow_y];
+                    for (int i = 1; i <= 3; i++) {
+                        gem(0, col, y - i);
+                        deleteCell(cells, col, y - i);
+                        points += 50;
+                    }
+                    cells[elbow_x][elbow_y] = Gem + 12;
+                }
+                else {
+                    for (int i = 1; i <= 3; i++) {
+                        gem(0, col, y - i);
+                        deleteCell(cells, col, y - i);
+                        points += 50;
+                    }
                 }
             }
             else if (count >= 4) { // Delete Four or more Consective Gems in a row and adding a flame gem
@@ -395,10 +478,21 @@ void deleteColDuplicate(int cells[cell_no][cell_no], int col) {
         }
     }
     if (count == 3) {  // Delete Three Consective Gems at the end of row
-        for (int i = 1; i <= 3; i++) {
-            gem(0, col, cell_no - i);
-            deleteCell(cells, col, cell_no - i);
-            points += 50;
+        if (isVerticalElbowFormed(cells, col, cell_no - 1, elbow_x, elbow_y) == true) {
+            Gem = cells[elbow_x][elbow_y];
+            for (int i = 1; i <= 3; i++) {
+                gem(0, col, cell_no - i);
+                deleteCell(cells, col, cell_no - i);
+                points += 50;
+            }
+            cells[elbow_x][elbow_y] = Gem + 12;
+        }
+        else {
+            for (int i = 1; i <= 3; i++) {
+                gem(0, col, cell_no - i);
+                deleteCell(cells, col, cell_no - i);
+                points += 50;
+            }
         }
     }
     else if (count >= 4) { // Delete Four or more Consective Gems at the end of a row and adding a flame gem
@@ -423,17 +517,78 @@ void deleteColDuplicate(int cells[cell_no][cell_no], int col) {
     }
 }
 
+bool isHorizontalElbowFormed(int cells[cell_no][cell_no], int x, int y, int& elbow_x, int& elbow_y) {
+    bool elbowfound = false;
+    for (int i = x; i >= x - 2; i--) {
+        if (areGemsSame(cells[i][y], cells[i][y+1]) == true && areGemsSame(cells[i][y+1], cells[i][y+2]) == true) {
+            elbowfound = true;
+            elbow_x = x;
+            elbow_y = i;
+            deleteCell(cells, i, y+1);
+            gem(0, i, y + 1);
+            deleteCell(cells, i, y+2);
+            gem(0, i, y + 2);
+            points += 100;
+        }
+        if (areGemsSame(cells[i][y], cells[i][y - 1]) == true && areGemsSame(cells[i][y - 1], cells[i][y - 2]) == true) {
+            elbowfound = true;
+            elbow_x = x;
+            elbow_y = i;
+            deleteCell(cells, i, y - 1);
+            gem(0, i, y - 1);
+            deleteCell(cells, i, y - 2);
+            gem(0, i, y - 2);
+            points += 100;
+        }
+    }
+    if (areGemsSame(cells[x - 2][y - 1], cells[x - 2][y]) == true && areGemsSame(cells[x - 2][y], cells[x - 2][y + 1]) == true){
+        elbowfound = true;
+        elbow_x = x - 2;
+        elbow_y = y;
+        deleteCell(cells, x - 2, y - 1);
+        gem(0, x - 2, y - 1);
+        deleteCell(cells, x - 2, y + 1);
+        gem(0, x - 2, y + 1);
+        points += 100;
+    }
+    if (areGemsSame(cells[x][y - 1], cells[x][y]) == true && areGemsSame(cells[x][y], cells[x][y + 1]) == true){
+        elbowfound = true;
+        elbow_x = x;
+        elbow_y = y;
+        deleteCell(cells, x, y - 1);
+        gem(0, x, y - 1);
+        deleteCell(cells, x, y + 1);
+        gem(0, x, y + 1);
+        points += 100;
+    }
+    return elbowfound;
+}
+
 void deleteRowDuplicate(int cells[cell_no][cell_no], int row) {
     int count = 1;
+    int elbow_x, elbow_y;
+    int Gem;
     for (int x = 1; x < cell_no; x++) {
         if (areGemsSame(cells[x][row], cells[x - 1][row]) == true)
             count++;
         else {
             if (count == 3) { // Delete Three Consective Gems in a column
-                for (int i = 1; i <= 3; i++) {
-                    gem(0, x - i, row);
-                    deleteCell(cells, x - i, row);
-                    points += 50;
+                if (isHorizontalElbowFormed(cells, x - 1, row, elbow_x, elbow_y)) {
+                    Gem = cells[elbow_x][elbow_y];
+                    for (int i = 1; i <= 3; i++) {
+                        gem(0, x - i, row);
+                        deleteCell(cells, x - i, row);
+                        points += 50;
+                    }
+                    cells[elbow_x][elbow_y] = Gem + 12;
+
+                }
+                else {
+                    for (int i = 1; i <= 3; i++) {
+                        gem(0, x - i, row);
+                        deleteCell(cells, x - i, row);
+                        points += 50;
+                    }
                 }
             }
             else if (count >= 4) {// Delete Four or more Consective Gems in a column and adding a flame gem
@@ -460,10 +615,22 @@ void deleteRowDuplicate(int cells[cell_no][cell_no], int row) {
         }
     }
     if (count == 3) {// Delete Three Consective Gems at the end of column
-        for (int i = 1; i <= 3; i++) {
-            gem(0, cell_no - i, row);
-            deleteCell(cells, cell_no - i, row);
-            points += 50;
+        if (isHorizontalElbowFormed(cells, cell_no - 1, row, elbow_x, elbow_y)) {
+            Gem = cells[elbow_x][elbow_y];
+            for (int i = 1; i <= 3; i++) {
+                gem(0, cell_no - i, row);
+                deleteCell(cells, cell_no - i, row);
+                points += 50;
+            }
+            cells[elbow_x][elbow_y] = Gem + 12;
+
+        }
+        else {
+            for (int i = 1; i <= 3; i++) {
+                gem(0, cell_no - i, row);
+                deleteCell(cells, cell_no - i, row);
+                points += 50;
+            }
         }
     }
     else if (count >= 4) {// Delete Four or more Consective Gems at the end of a column and adding a flame gem
@@ -498,10 +665,11 @@ bool AnyEmptyCell(int cells[cell_no][cell_no]) {
 }
 
 void deleteDuplicates(int cells[cell_no][cell_no]) {
-    for (int row = 0; row < cell_no; row++)
-        deleteRowDuplicate(cells, row);
     for (int col = 0; col < cell_no; col++)
         deleteColDuplicate(cells, col);
+    for (int row = 0; row < cell_no; row++)
+        deleteRowDuplicate(cells, row);
+    
 }
 
 void updateCells(int cells[cell_no][cell_no]) {
