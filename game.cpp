@@ -8,6 +8,7 @@ int start_x = 400;
 int start_y = 100;
 int cell_size = 70;
 const int cell_no = 8;
+const int speed = 25;
 int end_x = start_x + cell_no * cell_size;
 int end_y = start_y + cell_no * cell_size;
 int points = 0;
@@ -36,12 +37,13 @@ void EmptyCells(int cells[cell_no][cell_no]) {
 void gem(int cell, int i, int j) {
 
     int size = cell_size/4;
+    int black_size = (cell_size / 2) - 3;
 
     int mid_x = (2 * start_x + cell_size * (2 * i + 1)) / 2;
     int mid_y = (2 * start_y + cell_size * (2 * j + 1)) / 2;
     // Black box or Empty cell is printed for 0
     if (cell == 0)
-        myRect(mid_x - (size + 3), mid_y - (size + 3), mid_x + (size + 3), mid_y + (size + 3), 0, 0, 0);
+        myRect(mid_x - black_size, mid_y - black_size, mid_x + black_size, mid_y + black_size, 0, 0, 0);
     // Circle is drawn for 1
     else if (cell == 1)
         myEllipse(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 255, 0, 255);
@@ -64,7 +66,7 @@ void gem(int cell, int i, int j) {
     }
     // Black box for 6
     else if (cell == 6)
-        myRect(mid_x - (size + 3), mid_y - (size + 3), mid_x + (size + 3), mid_y + (size + 3), 0, 0, 0);
+        myRect(mid_x - black_size, mid_y - black_size, mid_x + black_size, mid_y + black_size, 0, 0, 0);
     // Concentric Circles ar drawn for 7
     else if (cell == 7) {
         myEllipse(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 255, 0, 255);
@@ -120,16 +122,30 @@ void DrawGems(int cells[cell_no][cell_no]) {
     
 }
 
+bool isGeneratedDuplicates(int cells[cell_no][cell_no], int i, int j) {
+    bool flag = false;
+    if (i != 0 && cells[i][j] == cells[i - 1][j])
+        flag = true;
+    if (j != 0 && cells[i][j] == cells[i][j - 1])
+        flag = true;
+    if (i != cell_no - 1 && cells[i][j] == cells[i + 1][j])
+        flag = true;
+    if (j != cell_no - 1 && cells[i][j] == cells[i][j + 1])
+        flag = true;
+    return flag;
+}
+
 void randomizer(int cells[cell_no][cell_no]) {
     EmptyCells(cells);
     DrawGems(cells);
-    for (int i = 0; i < cell_no; i++)
-        for (int j = 0; j < cell_no; j++)
-            while ((i != 0 && cells[i][j] == cells[i - 1][j]) 
-                || (j != 0 && cells[i][j] == cells[i][j - 1])
-                || (i != cell_no - 1 && cells[i][j] == cells[i+1][j])
-                || (j != cell_no - 1 && cells[i][j] == cells[i][j + 1]))
+    for (int i = 0; i < cell_no; i++) {
+        for (int j = 0; j < cell_no; j++) {
+            cells[i][j] = (rand() % 5) + 1;
+            while (isGeneratedDuplicates(cells, i, j) == true) {
                 cells[i][j] = (rand() % 5) + 1;
+            }
+        }
+    }
 }
 
 bool isNeighbour(int selected_x, int selected_y, int cell_x, int cell_y) {
@@ -145,6 +161,13 @@ bool isNeighbour(int selected_x, int selected_y, int cell_x, int cell_y) {
     return flag;
 }
 
+bool areGemsSame(int gem1, int gem2) {
+    bool samegem = false;
+    if(gem1 != 0 && gem1 != 6 && gem1 != 12 && gem1 % 6 == gem2 % 6)
+        samegem = true;
+    return samegem;
+}
+
 bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y, int  cell_x, int cell_y) {
     int count = 1;
     bool shouldSwap = false;
@@ -152,7 +175,7 @@ bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y
     if (selected_y == cell_y) {
         // Checking Row for atleast three consecutive duplicates
         for (int i = 1; i < cell_no; i++) {
-            if (cells[i][cell_y] == cells[i - 1][cell_y]) {
+            if (areGemsSame(cells[i][cell_y], cells[i - 1][cell_y]) == true) {
                 count++;
                 if (count == 3)
                     shouldSwap = true;
@@ -163,7 +186,7 @@ bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y
         count = 1;
         // Checking Column Cell_x for atleast three consecutive duplicates
         for (int i = 1; i < cell_no; i++){
-            if (cells[cell_x][i] == cells[cell_x][i - 1]) {
+            if (areGemsSame(cells[cell_x][i], cells[cell_x][i - 1]) == true) {
                 count++;
                 if (count == 3)
                     shouldSwap = true;
@@ -174,7 +197,7 @@ bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y
         count = 1;
         // Checking Column selected_x for atleast three consecutive duplicates
         for (int i = 1; i < cell_no; i++) {
-            if (cells[selected_x][i] == cells[selected_x][i - 1]) {
+            if (areGemsSame(cells[selected_x][i], cells[selected_x][i - 1]) == true) {
                 count++;
                 if (count >= 3)
                     shouldSwap = true;
@@ -187,7 +210,7 @@ bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y
     else if (selected_x == cell_x) {
         // Checking column for atleast three consecutive duplicates
         for (int j = 1; j < cell_no; j++) {
-            if (cells[cell_x][j] == cells[cell_x][j - 1]) {
+            if (areGemsSame(cells[cell_x][j], cells[cell_x][j - 1]) == true) {
                 count++;
                 if (count >= 3)
                     shouldSwap = true;
@@ -199,7 +222,7 @@ bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y
         count = 1;
         // Checking cell_y row for atleast three consecutive duplicates
         for (int j = 1; j < cell_no; j++) {
-            if (cells[j][cell_y] == cells[j - 1][cell_y]) {
+            if (areGemsSame(cells[j][cell_y], cells[j - 1][cell_y]) == true) {
                 count++;
                 if (count >= 3)
                     shouldSwap = true;
@@ -210,7 +233,7 @@ bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y
         count = 1;
         // Checking selected_y row for atleast three consecutive duplicates
         for (int j = 1; j < cell_no; j++) {
-            if (cells[j][selected_y] == cells[j - 1][selected_y]) {
+            if (areGemsSame(cells[j][selected_y], cells[j - 1][selected_y]) == true) {
                 count++;
                 if (count >= 3)
                     shouldSwap = true;
@@ -223,59 +246,119 @@ bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y
     return shouldSwap;
 }
 
-void shiftCellsDown(int cells[cell_no][cell_no], int row, int col) {
+void deleteCell(int cells[cell_no][cell_no], int i, int j) {
+    if (cells[i][j] >= 0 && cells[i][j] <= 6 || cells[i][j] == 12)
+        cells[i][j] = 0;
+    else if (cells[i][j] > 6 && cells[i][j] < 12)
+        cells[i][j] = 6;
+    else if (cells[i][j] > 12 && cells[i][j] < 18)
+        cells[i][j] = 12;
+}
+
+void initiateFlameGem(int cells[cell_no][cell_no], int& pos_x, int& pos_y) {
+    for (int i = pos_x - 1; i <= pos_x + 1; i++)
+        for (int j = pos_y - 1; j <= pos_y + 1; j++) {
+            if (i < cell_no && i >= 0 && j < cell_no && j >= 0) {
+                Sleep(speed);
+                deleteCell(cells, i, j);
+                gem(0, i, j);
+            }
+        }
+    if(pos_x != 0)
+        pos_x--;
+    pos_y = cell_no - 1;
+}
+
+void shiftCellsDown(int cells[cell_no][cell_no], int pos_x, int pos_y) {
     // Add animation in future
-    for (int i = col; i >= 1; i--) {
-        Sleep(100);
-        gem(0, row, i);
-        cells[row][i] = cells[row][i - 1];
-        gem(cells[row][i], row, i);
+    for (int i = pos_y; i >= 1; i--) {
+        Sleep(speed);
+        cells[pos_x][i] = cells[pos_x][i - 1];
+        gem(cells[pos_x][i], pos_x, i);
+        gem(0, pos_x, i-1);
     }
 
-    gem(0, row, 0);
-    cells[row][0] = (rand() % 5) + 1;
-    while (cells[row][0] == cells[row][1] || (cells[row][0] == cells[row - 1][0] && row != 0) || (cells[row][0] == cells[row + 1][0] && row != cell_no - 1))
-        cells[row][0] = (rand() % 5) + 1;
-    gem(cells[row][0], row, 0);
+    gem(0, pos_x, 0);
+    cells[pos_x][0] = (rand() % 5) + 1;
+    while (isGeneratedDuplicates(cells, pos_x, 0) == true)
+        cells[pos_x][0] = (rand() % 5) + 1;
+    gem(cells[pos_x][0], pos_x, 0);
 }
 
 void fillEmptyCells(int cells[cell_no][cell_no]) {
-    for (int row = 0; row < cell_no; row++)
-        for (int col = cell_no - 1; col >= 0; col--)
-            if (cells[row][col] == 0)
-                shiftCellsDown(cells, row, col);
-}
 
-void deleteCell(int cells[cell_no][cell_no], int i, int j) {
-    if (cells[i][j] >= 0 && cells[i][j] < 6)
-        cells[i][j] = 0;
-    else if (cells[i][j] >= 6 && cells[i][j] < 12)
-        cells[i][j] = 6;
-    else if (cells[i][j] >= 12 && cells[i][j] < 18)
-        cells[i][j] = 12;
+    for (int pos_x = 0; pos_x < cell_no; pos_x++)
+        for (int pos_y = cell_no - 1; pos_y >= 0; pos_y--)
+            if (cells[pos_x][pos_y] == 6)
+                initiateFlameGem(cells, pos_x, pos_y);
+
+    for (int pos_x = 0; pos_x < cell_no; pos_x++)
+        for (int pos_y = cell_no - 1; pos_y >= 0; pos_y--)
+            if (cells[pos_x][pos_y] == 0)
+                shiftCellsDown(cells, pos_x, pos_y);
 }
 
 void deleteRowDuplicate(int cells[cell_no][cell_no], int row_no) {
     int count = 1;
     for (int y = 1; y < cell_no; y++) {
-        if (cells[row_no][y] == cells[row_no][y - 1] && cells[row_no][y] != 0)
+        if (areGemsSame(cells[row_no][y], cells[row_no][y - 1]) == true)
             count++;
         else {
-            if (count == 3) {
+            if (count == 3) { // Delete Three Consective Gems in a row
                 for (int i = 1; i <= 3; i++) {
                     gem(0, row_no, y - i);
                     deleteCell(cells, row_no, y - i);
                     points += 50;
                 }
             }
+            else if (count >= 4) { // Delete Four or more Consective Gems in a row and adding a flame gem
+                for (int i = 1; i <= count; i++) {
+                    if (i == count / 2) {
+                        gem(0, row_no, y - i);
+                        if (cells[row_no][y - i] < 6)
+                            cells[row_no][y - i] += 6;
+                        else {
+                            cells[row_no][y - 1] += 6;
+                            deleteCell(cells, row_no, y - i);
+                        }
+                        gem(cells[row_no][y - i], row_no, y - i);
+                        points += 50;
+                    }
+                    else {
+                        gem(0, row_no, y - i);
+                        deleteCell(cells, row_no, y - i);
+                        points += 50;
+                    }
+                }
+            }
             count = 1;
         }
     }
-    if (count == 3) {
+    if (count == 3) {  // Delete Three Consective Gems at the end of row
         for (int i = 1; i <= 3; i++) {
             gem(0, row_no, cell_no - i);
             deleteCell(cells, row_no, cell_no - i);
             points += 50;
+        }
+    }
+    else if (count >= 4) { // Delete Four or more Consective Gems at the end of a row and adding a flame gem
+        for (int i = 1; i <= count; i++) {
+            if (i == count / 2) {
+                gem(0, row_no, cell_no - i);
+                if (cells[row_no][cell_no - i] < 6)
+                    cells[row_no][cell_no - i] += 6;
+                else {
+                    cells[row_no][cell_no - 1] += 6;
+                    deleteCell(cells, row_no, cell_no - i);
+                }
+                gem(cells[row_no][cell_no - i], row_no, cell_no - i);
+                points += 50;
+            }
+            else {
+                gem(0, row_no, cell_no - i);
+                deleteCell(cells, row_no, cell_no - i);
+                points += 50;
+            }
         }
     }
 }
@@ -283,26 +366,75 @@ void deleteRowDuplicate(int cells[cell_no][cell_no], int row_no) {
 void deleteColDuplicate(int cells[cell_no][cell_no], int col_no) {
     int count = 1;
     for (int x = 1; x < cell_no; x++) {
-        if (cells[x][col_no] == cells[x - 1][col_no] && cells[x][col_no] != 0)
+        if (areGemsSame(cells[x][col_no], cells[x - 1][col_no]) == true)
             count++;
         else {
-            if (count == 3) {
+            if (count == 3) { // Delete Three Consective Gems in a column
                 for (int i = 1; i <= 3; i++) {
                     gem(0, x - i, col_no);
                     deleteCell(cells, x - i, col_no);
                     points += 50;
                 }
             }
+            else if (count >= 4) {// Delete Four or more Consective Gems in a column and adding a flame gem
+                for (int i = 1; i <= count; i++) {
+                    if (i == count / 2) {
+                        gem(0, x - i, col_no);
+                        if (cells[x - i][col_no] < 6)
+                            cells[x - i][col_no] += 6;
+                        else {
+                            cells[x - 1][col_no] += 6;
+                            deleteCell(cells, x - i, col_no);
+                        }
+                        gem(cells[x - i][col_no], x - i, col_no);
+                        points += 50;
+                    }
+                    else {
+                        gem(0, x - i, col_no);
+                        deleteCell(cells, x - i, col_no);
+                        points += 50;
+                    }
+                }
+            }
             count = 1;
         }
     }
-    if (count == 3) {
+    if (count == 3) {// Delete Three Consective Gems at the end of column
         for (int i = 1; i <= 3; i++) {
             gem(0, cell_no - i, col_no);
             deleteCell(cells, cell_no - i, col_no);
             points += 50;
         }
     }
+    else if (count >= 4) {// Delete Four or more Consective Gems at the end of a column and adding a flame gem
+        for (int i = 1; i <= count; i++) {
+            if (i == count / 2) {
+                gem(0, cell_no - i, col_no);
+                if (cells[cell_no - i][col_no] < 6)
+                    cells[cell_no - i][col_no] += 6;
+                else {
+                    cells[cell_no - 1][col_no] += 6;
+                    deleteCell(cells, cell_no - i, col_no);
+                }
+                gem(cells[cell_no - i][col_no], cell_no - i, col_no);
+                points += 50;
+            }
+            else {
+                gem(0, cell_no - i, col_no);
+                deleteCell(cells, cell_no - i, col_no);
+                points += 50;
+            }
+        }
+    }
+}
+
+bool AnyEmptyCell(int cells[cell_no][cell_no]) {
+    bool emptyCell = false;
+    for (int i = 0; i < cell_no; i++)
+        for (int j = 0; j < cell_no; j++)
+            if (cells[i][j] == 0 || cells[i][j] == 6 || cells[i][j] == 12)
+                emptyCell = true;
+    return emptyCell;
 }
 
 void deleteDuplicates(int cells[cell_no][cell_no]) {
@@ -313,8 +445,9 @@ void deleteDuplicates(int cells[cell_no][cell_no]) {
 }
 
 void updateCells(int cells[cell_no][cell_no]) {
+    if(AnyEmptyCell(cells) == false)
         deleteDuplicates(cells);
-        fillEmptyCells(cells);
+    fillEmptyCells(cells);
 }
 
 void selection(int cells[cell_no][cell_no], int cell_x, int cell_y, int& selected_x, int& selected_y, bool& is_selected, bool enter = false) {
@@ -335,6 +468,9 @@ void selection(int cells[cell_no][cell_no], int cell_x, int cell_y, int& selecte
             updateCells(cells);
         }
         is_selected = false;
+        int green_x = start_x + selected_x * (cell_size);
+        int green_y = start_y + selected_y * (cell_size);
+        myRect(green_x, green_y, green_x + cell_size, green_y + cell_size, 255, 255, 255); //Draws White box to remove green box
     }
     else if (is_selected == true && enter == true && shouldSwap == false) {
         selected_x = cell_x;
