@@ -67,7 +67,7 @@ void gem(int cell, int i, int j) {
     // Black box for 6
     else if (cell == 6)
         myRect(mid_x - black_size, mid_y - black_size, mid_x + black_size, mid_y + black_size, 0, 0, 0);
-    // Concentric Circles ar drawn for 7
+    // Concentric Circles are drawn for 7
     else if (cell == 7) {
         myEllipse(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 255, 0, 255);
         myEllipse(mid_x - size / 2, mid_y - size / 2, mid_x + size / 2, mid_y + size / 2, 255, 0, 255);
@@ -103,6 +103,66 @@ void gem(int cell, int i, int j) {
     }
     // Asterik is drawn for 11
     else if (cell == 11) {
+        //Cross
+        myLine(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 0, 255, 0);
+        myLine(mid_x - size, mid_y + size, mid_x + size, mid_y - size, 0, 255, 0);
+        //Plus
+        myLine(mid_x, mid_y - size, mid_x, mid_y + size, 0, 255, 0);
+        myLine(mid_x - size, mid_y, mid_x + size, mid_y, 0, 255, 0);
+    }
+    // Black box for 12
+    else if (cell == 12)
+        myRect(mid_x - black_size, mid_y - black_size, mid_x + black_size, mid_y + black_size, 0, 0, 0);
+    // Concentric Circles with plus are drawn for 13
+    else if (cell == 13) {
+        //Circles
+        myEllipse(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 255, 0, 255);
+        myEllipse(mid_x - size / 2, mid_y - size / 2, mid_x + size / 2, mid_y + size / 2, 255, 0, 255);
+        //Plus
+        myLine(mid_x, mid_y - size, mid_x, mid_y + size, 255, 0, 255);
+        myLine(mid_x - size, mid_y, mid_x + size, mid_y, 255, 0, 255);
+    }
+    // Star inside a circle is drawn for 14
+    else if (cell == 14) {
+        int y = size / 3;
+        //Circle
+        myEllipse(mid_x - size - y, mid_y - size - y, mid_x + size + y, mid_y + size + y, 0, 0, 255);
+        //downward triangle
+        myLine(mid_x - size, mid_y + y - size, mid_x + size, mid_y + y - size, 0, 0, 255);
+        myLine(mid_x + size, mid_y + y - size, mid_x, mid_y + y + size, 0, 0, 255);
+        myLine(mid_x, mid_y + y + size, mid_x - size, mid_y + y - size, 0, 0, 255);
+        // upward triangle
+        myLine(mid_x, mid_y - y - size, mid_x + size, mid_y - y + size, 0, 0, 255);
+        myLine(mid_x + size, mid_y - y + size, mid_x - size, mid_y - y + size, 0, 0, 255);
+        myLine(mid_x - size, mid_y - y + size, mid_x, mid_y - y - size, 0, 0, 255);
+    }
+    //Two perpendicular Ellipses with a plus is drawn for 15
+    else if (cell == 15) {
+        // horizontal ellipse
+        myEllipse(mid_x - size, mid_y - size / 2, mid_x + size, mid_y + size / 2, 255, 255, 0);
+        // vertical ellipse
+        myEllipse(mid_x - size / 2, mid_y - size, mid_x + size / 2, mid_y + size, 255, 255, 0);
+        //Plus
+        myLine(mid_x, mid_y - size, mid_x, mid_y + size, 255, 255, 0);
+        myLine(mid_x - size, mid_y, mid_x + size, mid_y, 255, 255, 0);
+    }
+    // Two Squarea with a plus are drawn for 16 one tilted and one straight
+    else if (cell == 16) {
+        // Normal square
+        myRect(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 0, 255, 255);
+        // Tilted square
+        myLine(mid_x, mid_y - size, mid_x + size, mid_y, 0, 255, 255);
+        myLine(mid_x + size, mid_y, mid_x, mid_y + size, 0, 255, 255);
+        myLine(mid_x, mid_y + size, mid_x - size, mid_y, 0, 255, 255);
+        myLine(mid_x - size, mid_y, mid_x, mid_y - size, 0, 255, 255);
+        //Plus
+        myLine(mid_x, mid_y - size, mid_x, mid_y + size, 0, 255, 255);
+        myLine(mid_x - size, mid_y, mid_x + size, mid_y, 0, 255, 255);
+    }
+    // Asterik with a circle is drawn for 17
+    else if (cell == 17) {
+        //Circle
+        myEllipse(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 0, 255, 0);
         //Cross
         myLine(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 0, 255, 0);
         myLine(mid_x - size, mid_y + size, mid_x + size, mid_y - size, 0, 255, 0);
@@ -173,7 +233,7 @@ bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y
     bool shouldSwap = false;
     swap(cells[selected_x][selected_y], cells[cell_x][cell_y]);
     if (selected_y == cell_y) {
-        // Checking Row for atleast three consecutive duplicates
+        // Checking column for atleast three consecutive duplicates
         for (int i = 1; i < cell_no; i++) {
             if (areGemsSame(cells[i][cell_y], cells[i - 1][cell_y]) == true) {
                 count++;
@@ -184,7 +244,7 @@ bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y
                 count = 1;
         }
         count = 1;
-        // Checking Column Cell_x for atleast three consecutive duplicates
+        // Checking row Cell_x for atleast three consecutive duplicates
         for (int i = 1; i < cell_no; i++){
             if (areGemsSame(cells[cell_x][i], cells[cell_x][i - 1]) == true) {
                 count++;
@@ -195,7 +255,7 @@ bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y
                 count = 1;
         }
         count = 1;
-        // Checking Column selected_x for atleast three consecutive duplicates
+        // Checking row selected_x for atleast three consecutive duplicates
         for (int i = 1; i < cell_no; i++) {
             if (areGemsSame(cells[selected_x][i], cells[selected_x][i - 1]) == true) {
                 count++;
@@ -298,35 +358,35 @@ void fillEmptyCells(int cells[cell_no][cell_no]) {
                 shiftCellsDown(cells, pos_x, pos_y);
 }
 
-void deleteRowDuplicate(int cells[cell_no][cell_no], int row_no) {
+void deleteColDuplicate(int cells[cell_no][cell_no], int col) {
     int count = 1;
     for (int y = 1; y < cell_no; y++) {
-        if (areGemsSame(cells[row_no][y], cells[row_no][y - 1]) == true)
+        if (areGemsSame(cells[col][y], cells[col][y - 1]) == true)
             count++;
         else {
             if (count == 3) { // Delete Three Consective Gems in a row
                 for (int i = 1; i <= 3; i++) {
-                    gem(0, row_no, y - i);
-                    deleteCell(cells, row_no, y - i);
+                    gem(0, col, y - i);
+                    deleteCell(cells, col, y - i);
                     points += 50;
                 }
             }
             else if (count >= 4) { // Delete Four or more Consective Gems in a row and adding a flame gem
                 for (int i = 1; i <= count; i++) {
                     if (i == count / 2) {
-                        gem(0, row_no, y - i);
-                        if (cells[row_no][y - i] < 6)
-                            cells[row_no][y - i] += 6;
+                        gem(0, col, y - i);
+                        if (cells[col][y - i] < 6)
+                            cells[col][y - i] += 6;
                         else {
-                            cells[row_no][y - 1] += 6;
-                            deleteCell(cells, row_no, y - i);
+                            cells[col][y - 1] += 6;
+                            deleteCell(cells, col, y - i);
                         }
-                        gem(cells[row_no][y - i], row_no, y - i);
+                        gem(cells[col][y - i], col, y - i);
                         points += 50;
                     }
                     else {
-                        gem(0, row_no, y - i);
-                        deleteCell(cells, row_no, y - i);
+                        gem(0, col, y - i);
+                        deleteCell(cells, col, y - i);
                         points += 50;
                     }
                 }
@@ -336,62 +396,62 @@ void deleteRowDuplicate(int cells[cell_no][cell_no], int row_no) {
     }
     if (count == 3) {  // Delete Three Consective Gems at the end of row
         for (int i = 1; i <= 3; i++) {
-            gem(0, row_no, cell_no - i);
-            deleteCell(cells, row_no, cell_no - i);
+            gem(0, col, cell_no - i);
+            deleteCell(cells, col, cell_no - i);
             points += 50;
         }
     }
     else if (count >= 4) { // Delete Four or more Consective Gems at the end of a row and adding a flame gem
         for (int i = 1; i <= count; i++) {
             if (i == count / 2) {
-                gem(0, row_no, cell_no - i);
-                if (cells[row_no][cell_no - i] < 6)
-                    cells[row_no][cell_no - i] += 6;
+                gem(0, col, cell_no - i);
+                if (cells[col][cell_no - i] < 6)
+                    cells[col][cell_no - i] += 6;
                 else {
-                    cells[row_no][cell_no - 1] += 6;
-                    deleteCell(cells, row_no, cell_no - i);
+                    cells[col][cell_no - 1] += 6;
+                    deleteCell(cells, col, cell_no - i);
                 }
-                gem(cells[row_no][cell_no - i], row_no, cell_no - i);
+                gem(cells[col][cell_no - i], col, cell_no - i);
                 points += 50;
             }
             else {
-                gem(0, row_no, cell_no - i);
-                deleteCell(cells, row_no, cell_no - i);
+                gem(0, col, cell_no - i);
+                deleteCell(cells, col, cell_no - i);
                 points += 50;
             }
         }
     }
 }
 
-void deleteColDuplicate(int cells[cell_no][cell_no], int col_no) {
+void deleteRowDuplicate(int cells[cell_no][cell_no], int row) {
     int count = 1;
     for (int x = 1; x < cell_no; x++) {
-        if (areGemsSame(cells[x][col_no], cells[x - 1][col_no]) == true)
+        if (areGemsSame(cells[x][row], cells[x - 1][row]) == true)
             count++;
         else {
             if (count == 3) { // Delete Three Consective Gems in a column
                 for (int i = 1; i <= 3; i++) {
-                    gem(0, x - i, col_no);
-                    deleteCell(cells, x - i, col_no);
+                    gem(0, x - i, row);
+                    deleteCell(cells, x - i, row);
                     points += 50;
                 }
             }
             else if (count >= 4) {// Delete Four or more Consective Gems in a column and adding a flame gem
                 for (int i = 1; i <= count; i++) {
                     if (i == count / 2) {
-                        gem(0, x - i, col_no);
-                        if (cells[x - i][col_no] < 6)
-                            cells[x - i][col_no] += 6;
+                        gem(0, x - i, row);
+                        if (cells[x - i][row] < 6)
+                            cells[x - i][row] += 6;
                         else {
-                            cells[x - 1][col_no] += 6;
-                            deleteCell(cells, x - i, col_no);
+                            cells[x - 1][row] += 6;
+                            deleteCell(cells, x - i, row);
                         }
-                        gem(cells[x - i][col_no], x - i, col_no);
+                        gem(cells[x - i][row], x - i, row);
                         points += 50;
                     }
                     else {
-                        gem(0, x - i, col_no);
-                        deleteCell(cells, x - i, col_no);
+                        gem(0, x - i, row);
+                        deleteCell(cells, x - i, row);
                         points += 50;
                     }
                 }
@@ -401,27 +461,27 @@ void deleteColDuplicate(int cells[cell_no][cell_no], int col_no) {
     }
     if (count == 3) {// Delete Three Consective Gems at the end of column
         for (int i = 1; i <= 3; i++) {
-            gem(0, cell_no - i, col_no);
-            deleteCell(cells, cell_no - i, col_no);
+            gem(0, cell_no - i, row);
+            deleteCell(cells, cell_no - i, row);
             points += 50;
         }
     }
     else if (count >= 4) {// Delete Four or more Consective Gems at the end of a column and adding a flame gem
         for (int i = 1; i <= count; i++) {
             if (i == count / 2) {
-                gem(0, cell_no - i, col_no);
-                if (cells[cell_no - i][col_no] < 6)
-                    cells[cell_no - i][col_no] += 6;
+                gem(0, cell_no - i, row);
+                if (cells[cell_no - i][row] < 6)
+                    cells[cell_no - i][row] += 6;
                 else {
-                    cells[cell_no - 1][col_no] += 6;
-                    deleteCell(cells, cell_no - i, col_no);
+                    cells[cell_no - 1][row] += 6;
+                    deleteCell(cells, cell_no - i, row);
                 }
-                gem(cells[cell_no - i][col_no], cell_no - i, col_no);
+                gem(cells[cell_no - i][row], cell_no - i, row);
                 points += 50;
             }
             else {
-                gem(0, cell_no - i, col_no);
-                deleteCell(cells, cell_no - i, col_no);
+                gem(0, cell_no - i, row);
+                deleteCell(cells, cell_no - i, row);
                 points += 50;
             }
         }
@@ -473,6 +533,9 @@ void selection(int cells[cell_no][cell_no], int cell_x, int cell_y, int& selecte
         myRect(green_x, green_y, green_x + cell_size, green_y + cell_size, 255, 255, 255); //Draws White box to remove green box
     }
     else if (is_selected == true && enter == true && shouldSwap == false) {
+        int green_x = start_x + selected_x * (cell_size);
+        int green_y = start_y + selected_y * (cell_size);
+        myRect(green_x, green_y, green_x + cell_size, green_y + cell_size, 255, 255, 255); //Draws White box to remove green box
         selected_x = cell_x;
         selected_y = cell_y;
     }
@@ -549,8 +612,6 @@ int main() {
             selection(cells, cell_x, cell_y, selected_x, selected_y, is_selected);
             myRect(x, y, x + cell_size, y + cell_size, 255, 0, 0);
             DrawGems(cells);
-            //gem(cells[cell_x][cell_y], cell_x, cell_y);
-            //gem(cells[cell_x+1][cell_y], cell_x+1, cell_y);
         }
         else if (key_pressed == true && keyboard_key == 2) {
             MoveSelectorUp(x, y, cell_x, cell_y);
