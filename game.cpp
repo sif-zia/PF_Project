@@ -28,7 +28,8 @@ void EmptyCells(int cells[cell_no][cell_no]) {
 
     for (int i = 0; i < cell_no; i++) {
         for (int j = 0; j < cell_no; j++) {
-            cells[i][j] = 0;
+            if (cells[i][j] < 6)
+                cells[i][j] = 0;
         }
     }
 
@@ -200,9 +201,11 @@ void randomizer(int cells[cell_no][cell_no]) {
     DrawGems(cells);
     for (int i = 0; i < cell_no; i++) {
         for (int j = 0; j < cell_no; j++) {
-            cells[i][j] = (rand() % 5) + 1;
-            while (isGeneratedDuplicates(cells, i, j) == true) {
+            if (cells[i][j] == 0) {
                 cells[i][j] = (rand() % 5) + 1;
+                while (isGeneratedDuplicates(cells, i, j) == true) {
+                    cells[i][j] = (rand() % 5) + 1;
+                }
             }
         }
     }
@@ -364,15 +367,14 @@ void shiftGemsDown(int cells[cell_no][cell_no], int pos_x, int pos_y) {
 
 void fillEmptyCells(int cells[cell_no][cell_no]) {
 
-    for (int pos_x = 0; pos_x < cell_no; pos_x++)
-        for (int pos_y = cell_no - 1; pos_y >= 0; pos_y--)
-            if (cells[pos_x][pos_y] == 12)
-                initiateDestroyerGem(cells, pos_x, pos_y);
-
-    for (int pos_x = 0; pos_x < cell_no; pos_x++)
-        for (int pos_y = cell_no - 1; pos_y >= 0; pos_y--)
+    for (int pos_x = 0; pos_x < cell_no; pos_x++) {
+        for (int pos_y = cell_no - 1; pos_y >= 0; pos_y--) {
             if (cells[pos_x][pos_y] == 6)
                 initiateFlameGem(cells, pos_x, pos_y);
+            else if (cells[pos_x][pos_y] == 12)
+                initiateDestroyerGem(cells, pos_x, pos_y);
+        }
+    }
 
     for (int pos_x = 0; pos_x < cell_no; pos_x++)
         for (int pos_y = cell_no - 1; pos_y >= 0; pos_y--)
@@ -393,7 +395,7 @@ bool isVerticalElbowFormed(int cells[cell_no][cell_no], int x, int y, int& elbow
             gem(0, x + 2, i);
             points += 100;
         }
-        if (areGemsSame(cells[x][i], cells[x - 1][i]) == true && areGemsSame(cells[x - 1][i], cells[x - 2][i]) == true) {
+        if (areGemsSame(cells[x][i], cells[x - 1][i]) == true && areGemsSame(cells[x - 1][i], cells[x - 2][i]) == true && !elbowfound) {
             elbowfound = true;
             elbow_x = x;
             elbow_y = i;
@@ -405,7 +407,7 @@ bool isVerticalElbowFormed(int cells[cell_no][cell_no], int x, int y, int& elbow
         }
     }
     
-    if (areGemsSame(cells[x - 1][y - 2], cells[x][y - 2]) == true && areGemsSame(cells[x][y - 2], cells[x + 1][y - 2]) == true){
+    if (areGemsSame(cells[x - 1][y - 2], cells[x][y - 2]) == true && areGemsSame(cells[x][y - 2], cells[x + 1][y - 2]) == true && !elbowfound){
         elbowfound = true;
         elbow_x = x;
         elbow_y = y-2;
@@ -415,7 +417,7 @@ bool isVerticalElbowFormed(int cells[cell_no][cell_no], int x, int y, int& elbow
         gem(0, x + 1, y - 2);
         points += 100;
     }
-    if (areGemsSame(cells[x - 1][y - 2], cells[x][y - 2]) == true && areGemsSame(cells[x][y - 2], cells[x + 1][y - 2]) == true){
+    if (areGemsSame(cells[x - 1][y - 2], cells[x][y - 2]) == true && areGemsSame(cells[x][y - 2], cells[x + 1][y - 2]) == true && !elbowfound) {
         elbowfound = true;
         elbow_x = x;
         elbow_y = y;
@@ -529,8 +531,7 @@ bool isHorizontalElbowFormed(int cells[cell_no][cell_no], int x, int y, int& elb
             deleteCell(cells, i, y+2);
             gem(0, i, y + 2);
             points += 100;
-        }
-        if (areGemsSame(cells[i][y], cells[i][y - 1]) == true && areGemsSame(cells[i][y - 1], cells[i][y - 2]) == true) {
+        }if (areGemsSame(cells[i][y], cells[i][y - 1]) == true && areGemsSame(cells[i][y - 1], cells[i][y - 2]) == true && !elbowfound) {
             elbowfound = true;
             elbow_x = x;
             elbow_y = i;
@@ -541,7 +542,7 @@ bool isHorizontalElbowFormed(int cells[cell_no][cell_no], int x, int y, int& elb
             points += 100;
         }
     }
-    if (areGemsSame(cells[x - 2][y - 1], cells[x - 2][y]) == true && areGemsSame(cells[x - 2][y], cells[x - 2][y + 1]) == true){
+    if (areGemsSame(cells[x - 2][y - 1], cells[x - 2][y]) == true && areGemsSame(cells[x - 2][y], cells[x - 2][y + 1]) == true && !elbowfound){
         elbowfound = true;
         elbow_x = x - 2;
         elbow_y = y;
@@ -551,7 +552,7 @@ bool isHorizontalElbowFormed(int cells[cell_no][cell_no], int x, int y, int& elb
         gem(0, x - 2, y + 1);
         points += 100;
     }
-    if (areGemsSame(cells[x][y - 1], cells[x][y]) == true && areGemsSame(cells[x][y], cells[x][y + 1]) == true){
+    if (areGemsSame(cells[x][y - 1], cells[x][y]) == true && areGemsSame(cells[x][y], cells[x][y + 1]) == true && !elbowfound) {
         elbowfound = true;
         elbow_x = x;
         elbow_y = y;
