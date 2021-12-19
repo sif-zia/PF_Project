@@ -2,6 +2,7 @@
 #include "help.h"
 #include <stdlib.h>
 #include <ctime>
+#include <chrono>
 using namespace std;
 
 int start_x = 400;
@@ -318,12 +319,23 @@ void deleteCell(int cells[cell_no][cell_no], int i, int j) {
         cells[i][j] = 12;
 }
 
+void deleteGem(int cells[cell_no][cell_no], int i, int j) {
+    if (cells[i][j] >= 0 && cells[i][j] < 6)
+        cells[i][j] = 0;
+    else if (cells[i][j] > 6 && cells[i][j] < 12)
+        cells[i][j] = 6;
+    else if (cells[i][j] > 12 && cells[i][j] < 18)
+        cells[i][j] = 12;
+
+}
+
 void initiateFlameGem(int cells[cell_no][cell_no], int& pos_x, int& pos_y) {
+    deleteCell(cells, pos_x, pos_y);
     for (int i = pos_x - 1; i <= pos_x + 1; i++)
         for (int j = pos_y - 1; j <= pos_y + 1; j++) {
             if (i < cell_no && i >= 0 && j < cell_no && j >= 0) {
                 Sleep(speed);
-                deleteCell(cells, i, j);
+                deleteGem(cells, i, j);
                 gem(0, i, j);
             }
         }
@@ -334,9 +346,10 @@ void initiateFlameGem(int cells[cell_no][cell_no], int& pos_x, int& pos_y) {
 
 void initiateDestroyerGem(int cells[cell_no][cell_no], int& pos_x, int& pos_y) {
 
+    deleteCell(cells, pos_x, pos_y);
     for (int x = 0; x < cell_no; x++) {
         Sleep(speed / 2);
-        deleteCell(cells, x, pos_y);
+        deleteGem(cells, x, pos_y);
         gem(0, x, pos_y);
     }
     for (int y = 0; y < cell_no; y++) {
@@ -407,7 +420,7 @@ bool isVerticalElbowFormed(int cells[cell_no][cell_no], int x, int y, int& elbow
         }
     }
     
-    if (areGemsSame(cells[x - 1][y - 2], cells[x][y - 2]) == true && areGemsSame(cells[x][y - 2], cells[x + 1][y - 2]) == true && !elbowfound){
+    if (areGemsSame(cells[x - 1][y - 2], cells[x][y - 2]) == true && areGemsSame(cells[x][y - 2], cells[x + 1][y - 2]) == true){
         elbowfound = true;
         elbow_x = x;
         elbow_y = y-2;
@@ -531,7 +544,8 @@ bool isHorizontalElbowFormed(int cells[cell_no][cell_no], int x, int y, int& elb
             deleteCell(cells, i, y+2);
             gem(0, i, y + 2);
             points += 100;
-        }if (areGemsSame(cells[i][y], cells[i][y - 1]) == true && areGemsSame(cells[i][y - 1], cells[i][y - 2]) == true && !elbowfound) {
+        }
+        if (areGemsSame(cells[i][y], cells[i][y - 1]) == true && areGemsSame(cells[i][y - 1], cells[i][y - 2]) == true && !elbowfound) {
             elbowfound = true;
             elbow_x = x;
             elbow_y = i;
@@ -542,7 +556,7 @@ bool isHorizontalElbowFormed(int cells[cell_no][cell_no], int x, int y, int& elb
             points += 100;
         }
     }
-    if (areGemsSame(cells[x - 2][y - 1], cells[x - 2][y]) == true && areGemsSame(cells[x - 2][y], cells[x - 2][y + 1]) == true && !elbowfound){
+    if (areGemsSame(cells[x - 2][y - 1], cells[x - 2][y]) == true && areGemsSame(cells[x - 2][y], cells[x - 2][y + 1]) == true){
         elbowfound = true;
         elbow_x = x - 2;
         elbow_y = y;
@@ -679,7 +693,7 @@ void updateCells(int cells[cell_no][cell_no]) {
     fillEmptyCells(cells);
 }
 
-void selection(int cells[cell_no][cell_no], int cell_x, int cell_y, int& selected_x, int& selected_y, bool& is_selected, bool enter = false) {
+void selectionAndswapping(int cells[cell_no][cell_no], int cell_x, int cell_y, int& selected_x, int& selected_y, bool& is_selected, bool enter = false) {
     bool shouldSwap = isNeighbour(selected_x, selected_y, cell_x, cell_y);
 
     if (is_selected == false && enter == true) {
@@ -753,6 +767,9 @@ int main() {
 
     srand(time(0));
 
+    auto start = std::chrono::high_resolution_clock::now();
+
+
     int keyboard_key;
     bool key_pressed, is_selected = false;
     int x = start_x, y = start_y, cell_x = 0, cell_y = 0, selected_x = -1, selected_y = -1;
@@ -778,46 +795,53 @@ int main() {
         if (key_pressed == true && keyboard_key == 1) {
             MoveSelectorLeft(x, y, cell_x, cell_y);
             DrawGrid();
-            selection(cells, cell_x, cell_y, selected_x, selected_y, is_selected);
+            selectionAndswapping(cells, cell_x, cell_y, selected_x, selected_y, is_selected);
             myRect(x, y, x + cell_size, y + cell_size, 255, 0, 0);
             DrawGems(cells);
         }
         else if (key_pressed == true && keyboard_key == 2) {
             MoveSelectorUp(x, y, cell_x, cell_y);
             DrawGrid();
-            selection(cells, cell_x, cell_y, selected_x, selected_y, is_selected);
+            selectionAndswapping(cells, cell_x, cell_y, selected_x, selected_y, is_selected);
             myRect(x, y, x + cell_size, y + cell_size, 255, 0, 0);
             DrawGems(cells);
         }
         else if (key_pressed == true && keyboard_key == 3) {
             MoveSelectorRight(x, y, cell_x, cell_y);
             DrawGrid();
-            selection(cells, cell_x, cell_y, selected_x, selected_y, is_selected);
+            selectionAndswapping(cells, cell_x, cell_y, selected_x, selected_y, is_selected);
             myRect(x, y, x + cell_size, y + cell_size, 255, 0, 0);
             DrawGems(cells);
         }
         else if (key_pressed == true && keyboard_key == 4) {
             MoveSelectorDown(x, y, cell_x, cell_y);
             DrawGrid();
-            selection(cells, cell_x, cell_y, selected_x, selected_y, is_selected);
+            selectionAndswapping(cells, cell_x, cell_y, selected_x, selected_y, is_selected);
             myRect(x, y, x + cell_size, y + cell_size, 255, 0, 0);
             DrawGems(cells);
         }
         else if (key_pressed == true && keyboard_key == 5) {
             DrawGrid();
-            selection(cells, cell_x, cell_y, selected_x, selected_y, is_selected, true);
+            selectionAndswapping(cells, cell_x, cell_y, selected_x, selected_y, is_selected, true);
             myRect(x, y, x + cell_size, y + cell_size, 255, 0, 0);
             DrawGems(cells);
         }
         else if (key_pressed == true && keyboard_key == 6) {
             randomizer(cells);
             DrawGrid();
-            selection(cells, cell_x, cell_y, selected_x, selected_y, is_selected);
+            selectionAndswapping(cells, cell_x, cell_y, selected_x, selected_y, is_selected);
             myRect(x, y, x + cell_size, y + cell_size, 255, 0, 0);
             DrawGems(cells);
         }
+        else if (key_pressed == true && keyboard_key == 7) {
+            break;
+        }
 
     }
+    system("cls");
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<float> time_passed = end - start;
+    cout << "Time Passed: " << time_passed.count() << "s\n";
     cin.get();
     return 0;
 }
