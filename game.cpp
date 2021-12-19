@@ -492,7 +492,12 @@ void deleteColDuplicate(int cells[cell_no][cell_no], int col) {
                         deleteCell(cells, col, y - i);
                         points += 50;
                     }
-                    cells[elbow_x][elbow_y] = Gem + 12;
+                    if(Gem < 6)
+                        cells[elbow_x][elbow_y] = Gem + 12;
+                    else {
+                        Gem %= 6;
+                        cells[elbow_x][elbow_y] = Gem + 12;
+                    }
                 }
                 else {
                     for (int i = 1; i <= 3; i++) {
@@ -503,17 +508,14 @@ void deleteColDuplicate(int cells[cell_no][cell_no], int col) {
                 }
             }
             else if (count >= 4) { // Delete Four or more Consective Gems in a row and adding a flame gem
+                bool flame_inserted = false;
                 for (int i = 1; i <= count; i++) {
-                    if (i == count / 2) {
+                    if (cells[col][y - i] < 6 && flame_inserted == false) {
                         gem(0, col, y - i);
-                        if (cells[col][y - i] < 6)
-                            cells[col][y - i] += 6;
-                        else {
-                            cells[col][y - 1] += 6;
-                            deleteCell(cells, col, y - i);
-                        }
+                        cells[col][y - i] += 6;
                         gem(cells[col][y - i], col, y - i);
                         points += 50;
+                        flame_inserted = true;
                     }
                     else {
                         gem(0, col, y - i);
@@ -533,7 +535,12 @@ void deleteColDuplicate(int cells[cell_no][cell_no], int col) {
                 deleteCell(cells, col, cell_no - i);
                 points += 50;
             }
-            cells[elbow_x][elbow_y] = Gem + 12;
+            if (Gem < 6)
+                cells[elbow_x][elbow_y] = Gem + 12;
+            else {
+                Gem %= 6;
+                cells[elbow_x][elbow_y] = Gem + 12;
+            }
         }
         else {
             for (int i = 1; i <= 3; i++) {
@@ -544,17 +551,14 @@ void deleteColDuplicate(int cells[cell_no][cell_no], int col) {
         }
     }
     else if (count >= 4) { // Delete Four or more Consective Gems at the end of a row and adding a flame gem
+        bool flame_inserted = false;
         for (int i = 1; i <= count; i++) {
-            if (i == count / 2) {
+            if (cells[col][cell_no - i] < 6 && flame_inserted == false) {
                 gem(0, col, cell_no - i);
-                if (cells[col][cell_no - i] < 6)
-                    cells[col][cell_no - i] += 6;
-                else {
-                    cells[col][cell_no - 1] += 6;
-                    deleteCell(cells, col, cell_no - i);
-                }
+                cells[col][cell_no - i] += 6;
                 gem(cells[col][cell_no - i], col, cell_no - i);
                 points += 50;
+                flame_inserted = true;
             }
             else {
                 gem(0, col, cell_no - i);
@@ -628,7 +632,12 @@ void deleteRowDuplicate(int cells[cell_no][cell_no], int row) {
                         deleteCell(cells, x - i, row);
                         points += 50;
                     }
-                    cells[elbow_x][elbow_y] = Gem + 12;
+                    if (Gem < 6)
+                        cells[elbow_x][elbow_y] = Gem + 12;
+                    else {
+                        Gem %= 6;
+                        cells[elbow_x][elbow_y] = Gem + 12;
+                    }
 
                 }
                 else {
@@ -640,17 +649,14 @@ void deleteRowDuplicate(int cells[cell_no][cell_no], int row) {
                 }
             }
             else if (count >= 4) {// Delete Four or more Consective Gems in a column and adding a flame gem
+                bool flame_inserted = false;
                 for (int i = 1; i <= count; i++) {
-                    if (i == count / 2) {
+                    if (cells[x - i][row] < 6 && flame_inserted == false) {
                         gem(0, x - i, row);
-                        if (cells[x - i][row] < 6)
-                            cells[x - i][row] += 6;
-                        else {
-                            cells[x - 1][row] += 6;
-                            deleteCell(cells, x - i, row);
-                        }
+                        cells[x - i][row] += 6;
                         gem(cells[x - i][row], x - i, row);
                         points += 50;
+                        flame_inserted = true;
                     }
                     else {
                         gem(0, x - i, row);
@@ -670,7 +676,12 @@ void deleteRowDuplicate(int cells[cell_no][cell_no], int row) {
                 deleteCell(cells, cell_no - i, row);
                 points += 50;
             }
-            cells[elbow_x][elbow_y] = Gem + 12;
+            if (Gem < 6)
+                cells[elbow_x][elbow_y] = Gem + 12;
+            else {
+                Gem %= 6;
+                cells[elbow_x][elbow_y] = Gem + 12;
+            }
 
         }
         else {
@@ -682,17 +693,14 @@ void deleteRowDuplicate(int cells[cell_no][cell_no], int row) {
         }
     }
     else if (count >= 4) {// Delete Four or more Consective Gems at the end of a column and adding a flame gem
+        bool flame_inserted = false;
         for (int i = 1; i <= count; i++) {
-            if (i == count / 2) {
+            if (cells[cell_no - i][row] < 6 && flame_inserted == false) {
                 gem(0, cell_no - i, row);
-                if (cells[cell_no - i][row] < 6)
-                    cells[cell_no - i][row] += 6;
-                else {
-                    cells[cell_no - 1][row] += 6;
-                    deleteCell(cells, cell_no - i, row);
-                }
+                cells[cell_no - i][row] += 6;
                 gem(cells[cell_no - i][row], cell_no - i, row);
                 points += 50;
+                flame_inserted = true;
             }
             else {
                 gem(0, cell_no - i, row);
