@@ -13,6 +13,39 @@ const int speed = 25;
 int end_x = start_x + cell_no * cell_size;
 int end_y = start_y + cell_no * cell_size;
 int points = 0;
+auto current = std::chrono::high_resolution_clock::now();
+auto printed = current;
+
+bool timer(int& mins, int& secs, bool& updated, bool start_timer = false) {
+    bool flag = false;
+
+    if (updated == true)
+        updated = false;
+
+    if (start_timer = true)
+        current = std::chrono::high_resolution_clock::now();
+
+    std::chrono::duration<float> time_passed = current - printed;
+
+    if (time_passed.count() >= 1) { // When one second has passed execute the following condition
+
+        if (secs == 0 && mins == 0) // if secs and mins both are zero return true
+            flag = true;
+        else if (secs == 0 && mins > 0) {
+            mins--;  // When secs is zero and mins is greater than zero reduce 1 min
+            secs = 59; // and set secs to 59
+        }
+        else if (secs > 0) // When secs is greater than zero just decrement it
+            secs--;
+
+        printed = current;
+        updated = true;
+    }
+
+    current = std::chrono::high_resolution_clock::now();
+
+    return flag;
+}
 
 void DrawGrid() {
 
@@ -767,8 +800,6 @@ int main() {
 
     srand(time(0));
 
-    auto start = std::chrono::high_resolution_clock::now();
-
 
     int keyboard_key;
     bool key_pressed, is_selected = false;
@@ -838,10 +869,6 @@ int main() {
         }
 
     }
-    system("cls");
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<float> time_passed = end - start;
-    cout << "Time Passed: " << time_passed.count() << "s\n";
     cin.get();
     return 0;
 }
