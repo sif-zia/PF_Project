@@ -74,10 +74,13 @@ void gem(int cell, int i, int j) {
     int size = cell_size/4;
     int black_size = (cell_size / 2) - 3;
 
+    if (i < 0 || i >= cell_no || j < 0 || j >= cell_no)
+        return;
+
     int mid_x = (2 * start_x + cell_size * (2 * i + 1)) / 2;
     int mid_y = (2 * start_y + cell_size * (2 * j + 1)) / 2;
     // Black box or Empty cell is printed for 0
-    if (cell == 0)
+    if (cell%6 == 0)
         myRect(mid_x - black_size, mid_y - black_size, mid_x + black_size, mid_y + black_size, 0, 0, 0);
     // Circle is drawn for 1
     else if (cell == 1)
@@ -99,9 +102,6 @@ void gem(int cell, int i, int j) {
         myLine(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 0, 255, 0);
         myLine(mid_x - size, mid_y + size, mid_x + size, mid_y - size, 0, 255, 0);
     }
-    // Black box for 6
-    else if (cell == 6)
-        myRect(mid_x - black_size, mid_y - black_size, mid_x + black_size, mid_y + black_size, 0, 0, 0);
     // Concentric Circles are drawn for 7
     else if (cell == 7) {
         myEllipse(mid_x - size, mid_y - size, mid_x + size, mid_y + size, 255, 0, 255);
@@ -145,9 +145,6 @@ void gem(int cell, int i, int j) {
         myLine(mid_x, mid_y - size, mid_x, mid_y + size, 0, 255, 0);
         myLine(mid_x - size, mid_y, mid_x + size, mid_y, 0, 255, 0);
     }
-    // Black box for 12
-    else if (cell == 12)
-        myRect(mid_x - black_size, mid_y - black_size, mid_x + black_size, mid_y + black_size, 0, 0, 0);
     // Concentric Circles with plus are drawn for 13
     else if (cell == 13) {
         //Circles
