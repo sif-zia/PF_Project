@@ -20,7 +20,7 @@ auto current = std::chrono::high_resolution_clock::now();
 auto printed = current;
 
 
-void letters(char chr, int x1, int x2, int y1, int y2, int size, int R, int G = 0, int B = 0) {
+void letters(char chr, int x1, int x2, int y1, int y2, int size, int R = 0, int G = 0, int B = 0) {
     x1 += 5;
     x2 -= 5;
     y1 += 5;
@@ -252,7 +252,7 @@ void letters(char chr, int x1, int x2, int y1, int y2, int size, int R, int G = 
         myLine(x2, y2, x1, y2, R, G, B);
     }
     else if (chr == '-')
-        myRect(x1, y1, x2, y2, R, G, B);
+        myRect(x1-5, y1-5, x2+5, y2+5, R, G, B);
 }
 
 void Capitalizer(char text[]) {
@@ -306,8 +306,65 @@ void drawText(int size, int start_x, int start_y, int R, int G, int B, char text
 
 }
 
+void printTime(int mins, int secs, bool time_out) {
+    int size = 25;
+    int R, G, B;
+    R = G = B = 255;
+    int timer_x = start_x + (cell_no + 1) * (cell_size), x1, x2, y1, y2;
+    int timer_y = start_y + 2 * (cell_size);
+
+    y1 = timer_y;
+    y2 = timer_y + 2 * size;
+    if (time_out == false) {
+
+        char text[75] = "Time Remaining: ";
+        Capitalizer(text);
+        int i = 0;
+
+        for (; i < strlen(text); i++) {
+            x1 = timer_x + size * i;
+            x2 = timer_x + size * (i + 1);
+            letters(text[i], x1, x2, y1, y2, size, R, G, B);
+        }
+        x1 = timer_x + size * i;
+        x2 = timer_x + size * (i + 1);
+        letters('-', x1, x2, y1, y2, size);
+        letters((mins / 10) + 48, x1, x2, y1, y2, size, R, G, B);
+        i++;
+        x1 = timer_x + size * i;
+        x2 = timer_x + size * (i + 1);
+        letters('-', x1, x2, y1, y2, size);
+        letters((mins % 10) + 48, x1, x2, y1, y2, size, R, G, B);
+        i++;
+        x1 = timer_x + size * i;
+        x2 = timer_x + size * (i + 1);
+        letters('-', x1, x2, y1, y2, size);
+        letters(':', x1, x2, y1, y2, size, R, G, B);
+        i++;
+        x1 = timer_x + size * i;
+        x2 = timer_x + size * (i + 1);
+        letters('-', x1, x2, y1, y2, size);
+        letters((secs / 10) + 48, x1, x2, y1, y2, size, R, G, B);
+        i++;
+        x1 = timer_x + size * i;
+        x2 = timer_x + size * (i + 1);
+        letters('-', x1, x2, y1, y2, size);
+        letters((secs % 10) + 48, x1, x2, y1, y2, size, R, G, B);
+    }
+    else {
+        char text[] = "Game Over! Press Escape to Exit!";
+        Capitalizer(text); int i = 0;
+        for (; i < strlen(text); i++) {
+            x1 = timer_x + size * i;
+            x2 = timer_x + size * (i + 1);
+            letters('-', x1, x2, y1, y2, size);
+            letters(text[i], x1, x2, y1, y2, size, R, G, B);
+        }
+    }
+}
+
 bool timer(int& mins, int& secs, bool& updated, bool start_timer = false) {
-    bool flag = false;
+    bool time_out = false;
 
     if (updated == true)
         updated = false;
@@ -320,7 +377,7 @@ bool timer(int& mins, int& secs, bool& updated, bool start_timer = false) {
     if (time_passed.count() >= 1) { // When one second has passed execute the following condition
 
         if (secs == 0 && mins == 0) // if secs and mins both are zero return true
-            flag = true;
+            time_out = true;
         else if (secs == 0 && mins > 0) {
             mins--;  // When secs is zero and mins is greater than zero reduce 1 min
             secs = 59; // and set secs to 59
@@ -332,16 +389,12 @@ bool timer(int& mins, int& secs, bool& updated, bool start_timer = false) {
         updated = true;
     }
 
+    if (updated == true)
+        printTime(mins, secs, time_out);
+
     current = std::chrono::high_resolution_clock::now();
 
-    return flag;
-}
-
-void printTimer(int mins, int secs) {
-    int timer_x = start_x + 9 * (cell_size);
-    int timer_y = start_y + 2 * (cell_size);
-
-
+    return time_out;
 }
 
 void DrawGrid() {
@@ -1104,8 +1157,8 @@ int main() {
 
 
     int keyboard_key;
-    bool key_pressed, is_selected = false, isNum = true;
-    int x = start_x, y = start_y, cell_x = 0, cell_y = 0, selected_x = -1, selected_y = -1;
+    bool key_pressed, is_selected = false, isNum = true, updated = false;
+    int x = start_x, y = start_y, cell_x = 0, cell_y = 0, selected_x = -1, selected_y = -1, mins = 1, secs = 0;
 
     system("@echo off");
     system("mode 800");
@@ -1117,9 +1170,12 @@ int main() {
     DrawGrid();
     myRect(x, y, x + cell_size, y + cell_size, 255, 0, 0);
     DrawGems(cells);
+    
+    bool time_out = timer(mins, secs, updated, true);
 
-    while (1) {
+    while (time_out == false) {
         updateCells(cells);
+        time_out = timer(mins, secs, updated);
         key_pressed = isCursorKeyPressed(keyboard_key);
         
 
@@ -1169,6 +1225,10 @@ int main() {
         }
 
     }
+    key_pressed = isCursorKeyPressed(keyboard_key);
+    while (key_pressed != true && keyboard_key != 7)
+        key_pressed = isCursorKeyPressed(keyboard_key);
+
     cin.get();
     return 0;
 }
