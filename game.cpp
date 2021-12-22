@@ -1,5 +1,6 @@
 #include <iostream>
 #include "help.h"
+#include <windows.h>
 #include <stdlib.h>
 #include <ctime>
 #include <chrono>
