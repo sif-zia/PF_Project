@@ -2,11 +2,13 @@
 #include "help.h"
 #include <windows.h>
 #include <stdlib.h>
+#include <string.h>
 #include <ctime>
 #include <chrono>
+#include <Windows.h>
 using namespace std;
 
-int start_x = 400;
+int start_x = 50;
 int start_y = 100;
 int cell_size = 70;
 const int cell_no = 8;
@@ -16,6 +18,293 @@ int end_y = start_y + cell_no * cell_size;
 int points = 0;
 auto current = std::chrono::high_resolution_clock::now();
 auto printed = current;
+
+
+void letters(char chr, int x1, int x2, int y1, int y2, int size, int R, int G = 0, int B = 0) {
+    x1 += 5;
+    x2 -= 5;
+    y1 += 5;
+    y2 -= 5;
+    int mid_x = (x1 + x2) / 2;
+    int mid_y = (y1 + y2) / 2;
+
+    if (chr == 'A') {
+        myLine(mid_x, y1, x1, y2, R);
+        myLine(mid_x, y1, x2, y2, R);
+        myLine(x1 + 2, mid_y + size / 2, x2 - 3, mid_y + size / 2, R, G, B);
+    }
+    else if (chr == 'B') {
+        myLine(x1, y1, x1, y2, R, G, B);
+        myLine(x1, y1, mid_x + size / 4, y1 + size / 8, R, G, B);
+        myLine(mid_x + size / 4, y1 + size / 8, mid_x, mid_y, R, G, B);
+        myLine(x1, mid_y, mid_x, mid_y, R, G, B);
+        myLine(mid_x, mid_y, x2, mid_y + size / 4, R, G, B);
+        myLine(x2, mid_y + size / 4, mid_x + size / 8, y2, R, G, B);
+        myLine(mid_x + size / 8, y2, x1, y2, R, G, B);
+    }
+    else if (chr == 'C') {
+        myLine(x1, y1, x1, y2, R, G, B);
+        myLine(x1, y1, x2, y1, R, G, B);
+        myLine(x2, y1, x2, y1 + size / 4, R, G, B);
+        myLine(x2, y2, x2, y2 - size / 4, R, G, B);
+        myLine(x1, y2, x2, y2, R, G, B);
+    }
+    else if (chr == 'D') {
+        myLine(x1, y1, x1, y2, R, G, B);
+        myLine(x1, y1, mid_x + size / 4, y1 + size / 4, R, G, B);
+        myLine(mid_x + size / 4, y1 + size / 4, mid_x + size / 4, y2 - size / 4, R, G, B);
+        myLine(mid_x + size / 4, y2 - size / 4, x1, y2, R, G, B);
+    }
+    else if (chr == 'E') {
+        myLine(x1, y1, x1, y2, R, G, B);
+        myLine(x1, y1, x2, y1, R, G, B);
+        myLine(x1, mid_y, x2, mid_y, R, G, B);
+        myLine(x1, y2, x2, y2, R, G, B);
+    }
+    else if (chr == 'F') {
+        myLine(x1, y1, x1, y2, R, G, B);
+        myLine(x1, y1, x2, y1, R, G, B);
+        myLine(x1, mid_y, x2, mid_y, R, G, B);
+    }
+    else if (chr == 'G') {
+        myLine(x1, y1, x1, y2, R, G, B);
+        myLine(x1, y1, x2, y1, R, G, B);
+        myLine(x2, y1, x2, y1 + size / 4, R, G, B);
+        myLine(x2, y2, x2, y2 - size / 2, R, G, B);
+        myLine(x2, y2 - size / 2, mid_x, y2 - size / 2, R, G, B);
+        myLine(x1, y2, x2, y2, R, G, B);
+    }
+    else if (chr == 'H') {
+        myLine(x1, y1, x1, y2, R, G, B);
+        myLine(x2, y1, x2, y2, R, G, B);
+        myLine(x1, mid_y, x2, mid_y, R, G, B);
+    }
+    else if (chr == 'I') {
+        myLine(mid_x, y1, mid_x, y2, R, G, B);
+        myLine(x1, y1, x2, y1, R, G, B);
+        myLine(x1, y2, x2, y2, R, G, B);
+    }
+    else if (chr == 'J') {
+        myLine(x2, y1, x2, y2, R, G, B);
+        myLine(x1, y1, x2, y1, R, G, B);
+        myLine(x2, y2, x1, y2, R, G, B);
+        myLine(x1, y2, x1, y2 - size / 2, R, G, B);
+    }
+    else if (chr == 'K') {
+        myLine(x1, y1, x1, y2, R, G, B);
+        myLine(x1, mid_y, x2, y1, R, G, B);
+        myLine(x1, mid_y, x2, y2, R, G, B);
+    }
+    else if (chr == 'L') {
+        myLine(x1, y1, x1, y2, R, G, B);
+        myLine(x1, y2, x2, y2, R, G, B);
+    }
+    else if (chr == 'M') {
+        myLine(x1, y1, x1, y2, R, G, B);
+        myLine(x1, y1, mid_x, mid_y, R, G, B);
+        myLine(mid_x, mid_y, x2, y1, R, G, B);
+        myLine(x2, y1, x2, y2, R, G, B);
+    }
+    else if (chr == 'N') {
+        myLine(x1, y1, x1, y2, R, G, B);
+        myLine(x1, y1, x2, y2, R, G, B);
+        myLine(x2, y1, x2, y2, R, G, B);
+    }
+    else if (chr == 'O') {
+        myLine(x1, y1, x1, y2, R, G, B);
+        myLine(x1, y1, x2, y1, R, G, B);
+        myLine(x1, y2, x2, y2, R, G, B);
+        myLine(x2, y1, x2, y2, R, G, B);
+    }
+    else if (chr == 'P') {
+        myLine(x1, y1, x1, y2, R, G, B);
+        myLine(x1, y1, mid_x + size / 4, y1 + size / 8, R, G, B);
+        myLine(mid_x + size / 4, y1 + size / 8, mid_x, mid_y, R, G, B);
+        myLine(x1, mid_y, mid_x, mid_y, R, G, B);
+
+    }
+    else if (chr == 'Q') {
+        myLine(x1, y1, x1, y2 - 5, R, G, B);
+        myLine(x1, y1, mid_x + 3, y1, R, G, B);
+        myLine(mid_x + 3, y1, mid_x + 3, y2 - 5, R, G, B);
+        myLine(x1, y2 - 5, mid_x + 3, y2 - 5, R, G, B);
+        myLine(mid_x - 2, mid_y, mid_x + 3, y2 - 5, R, G, B);
+        myLine(mid_x + 3, y2 - 5, x2, y2, R, G, B);
+    }
+    else if (chr == 'R') {
+        myLine(x1, y1, x1, y2, R, G, B);
+        myLine(x1, y1, mid_x + size / 4, y1 + size / 8, R, G, B);
+        myLine(mid_x + size / 4, y1 + size / 8, mid_x, mid_y, R, G, B);
+        myLine(x1, mid_y, mid_x, mid_y, R, G, B);
+        myLine(mid_x, mid_y, x2, y2, R, G, B);
+    }
+    else if (chr == 'S') {
+        myLine(mid_x, y1, x2, y1 + size / 2, R, G, B);
+        myLine(mid_x, y1, x1, y1 + size / 2, R, G, B);
+        myLine(x1, y1 + size / 2, x2, y2 - size / 2, R, G, B);
+        myLine(x2, y2 - size / 2, mid_x, y2, R, G, B);
+        myLine(mid_x, y2, x1, y2 - size / 2, R, G, B);
+    }
+    else if (chr == 'T') {
+        myLine(mid_x, y1, mid_x, y2, R, G, B);
+        myLine(x1, y1, x2, y1, R, G, B);
+    }
+    else if (chr == 'U') {
+        myLine(x1, y1, x1, y2, R, G, B);
+        myLine(x1, y2, x2, y2, R, G, B);
+        myLine(x2, y1, x2, y2, R, G, B);
+
+    }
+    else if (chr == 'V') {
+        myLine(x1, y1, mid_x, y2, R, G, B);
+        myLine(mid_x, y2, x2, y1, R, G, B);
+    }
+    else if (chr == 'W') {
+        myLine(x1, y1, mid_x - size / 8, y2, R, G, B);
+        myLine(mid_x - size / 8, y2, mid_x, mid_y, R, G, B);
+        myLine(mid_x, mid_y, mid_x + size / 8, y2, R, G, B);
+        myLine(mid_x + size / 8, y2, x2, y1, R, G, B);
+    }
+    else if (chr == 'X') {
+        myLine(x1, y1, x2, y2, R, G, B);
+        myLine(x2, y1, x1, y2, R, G, B);
+
+    }
+    else if (chr == 'Y') {
+        myLine(x1, y1, mid_x, mid_y, R, G, B);
+        myLine(x2, y1, x1, y2, R, G, B);
+    }
+    else if (chr == 'Z') {
+        myLine(x1, y1, x2, y1, R, G, B);
+        myLine(x2, y1, x1, y2, R, G, B);
+        myLine(x1, y2, x2, y2, R, G, B);
+    }
+    else if (chr == '.') {
+        myRect(x2, y2 - size / 8, mid_x + size / 4, y2, R, G, B);
+    }
+    else if (chr == ',') {
+        myRect(x2, y2 - size / 3, mid_x + size / 4, y2 - size / 6, R, G, B);
+        myLine(x2, y2 - size / 3, x2, y2, R);
+        myLine(x2, y2, mid_x + size / 4, y2, R);
+    }
+    else if (chr == '!') {
+        myRect(mid_x - size / 8, y1, mid_x - 1, y2 - size / 3, R, G, B);
+        myRect(mid_x - size / 8, y2 - size / 8, mid_x, y2, R, G, B);
+    }
+    else if (chr == ':') {
+        myRect(x2, y2 - 20, mid_x + size / 4, y2 - 16, R, G, B);
+        myRect(x2, y2 - 4, mid_x + size / 4, y2, R, G, B);
+    }
+    else if (chr == '1') {
+        myLine(x1, mid_y - size / 2, mid_x, y1, R, G, B);
+        myLine(mid_x, y1, mid_x, y2, R, G, B);
+        myLine(x1, y2, x2, y2, R, G, B);
+    }
+    else if (chr == '2') {
+        myLine(x1, y1, x2, y1, R, G, B);
+        myLine(x2, y1, x2, mid_y, R, G, B);
+        myLine(x2, mid_y, x1, mid_y, R, G, B);
+        myLine(x1, mid_y, x1, y2, R, G, B);
+        myLine(x1, y2, x2, y2, R, G, B);
+    }
+    else if (chr == '3') {
+        myLine(x1, y1, x2, y1, R, G, B);
+        myLine(x2, y1, x2, mid_y, R, G, B);
+        myLine(x2, mid_y, x1, mid_y, R, G, B);
+        myLine(x2, mid_y, x2, y2, R, G, B);
+        myLine(x2, y2, x1, y2, R, G, B);
+    }
+    else if (chr == '4') {
+        myLine(x1, y1, x1, mid_y, R, G, B);
+        myLine(x1, mid_y, x2, mid_y, R, G, B);
+        myLine(mid_x + size / 6, y1, mid_x + size / 6, y2, R, G, B);
+    }
+    else if (chr == '5') {
+        myLine(x1, y1, x2, y1, R, G, B);
+        myLine(x1, y1, x1, mid_y, R, G, B);
+        myLine(x1, mid_y, x2, mid_y, R, G, B);
+        myLine(x2, mid_y, x2, y2, R, G, B);
+        myLine(x2, y2, x1, y2, R, G, B);
+    }
+    else if (chr == '6') {
+        myLine(x1, y1, x2, y1, R, G, B);
+        myLine(x1, y1, x1, y2, R, G, B);
+        myLine(x1, mid_y, x2, mid_y, R, G, B);
+        myLine(x2, mid_y, x2, y2, R, G, B);
+        myLine(x2, y2, x1, y2, R, G, B);
+    }
+    else if (chr == '7') {
+        myLine(x1, y1, x2, y1, R, G, B);
+        myLine(x2, y1, x2, y2, R, G, B);
+    }
+    else if (chr == '8') {
+        myLine(x1, y1, x2, y1, R, G, B);
+        myLine(x1, y1, x1, y2, R, G, B);
+        myLine(x1, mid_y, x2, mid_y, R, G, B);
+        myLine(x2, y1, x2, y2, R, G, B);
+        myLine(x2, y2, x1, y2, R, G, B);
+    }
+    else if (chr == '9') {
+        myLine(x1, y1, x2, y1, R, G, B);
+        myLine(x1, y1, x1, mid_y, R, G, B);
+        myLine(x1, mid_y, x2, mid_y, R, G, B);
+        myLine(x2, y1, x2, y2, R, G, B);
+        myLine(x2, y2, x1, y2, R, G, B);
+    }
+    else if (chr == '-')
+        myRect(x1, y1, x2, y2, R, G, B);
+}
+
+void Capitalizer(char text[]) {
+    for (int i = 0; i < strlen(text); i++)
+        if (text[i] >= 'a' && text[i] <= 'z')
+            text[i] -= 32;
+}
+
+void drawText(int size, int start_x, int start_y, int R, int G, int B, char text[], bool& isNum, int num = 0) {
+    int idx = 0;
+    int idx_x = 0;
+    int idx_y = 0;
+    int x1, x2, y1, y2;
+    int digit_count = 0;
+    int len = strlen(text);
+
+    if (isNum == true) {
+        int reverse_num = 0;
+        int i;
+
+        for (; num > 0; num /= 10, digit_count++)
+            reverse_num = (reverse_num * 10) + num % 10;
+
+        for (i = len; i - len < digit_count; i++, reverse_num /= 10)
+            text[i] = (reverse_num % 10) + 48;
+
+        text[i] = '\0';
+        isNum = false;
+    }
+
+    Capitalizer(text);
+
+    for (idx = 0; idx < strlen(text); idx++)
+    {
+        x1 = start_x + size * idx_x;
+        x2 = start_x + size * (idx_x + 1);
+
+        if (x2 > 1585 - size) {
+            idx_y++;
+            idx_x = 0;
+            x1 = start_x + size * idx_x;
+            x2 = start_x + size * (idx_x + 1);
+
+        }
+
+        y1 = start_y + 2 * size * idx_y;
+        y2 = start_y + 2 * size * (idx_y + 1);
+        letters(text[idx], x1, x2, y1, y2, size, R, G, B);
+        idx_x++;
+    }
+
+}
 
 bool timer(int& mins, int& secs, bool& updated, bool start_timer = false) {
     bool flag = false;
@@ -46,6 +335,13 @@ bool timer(int& mins, int& secs, bool& updated, bool start_timer = false) {
     current = std::chrono::high_resolution_clock::now();
 
     return flag;
+}
+
+void printTimer(int mins, int secs) {
+    int timer_x = start_x + 9 * (cell_size);
+    int timer_y = start_y + 2 * (cell_size);
+
+
 }
 
 void DrawGrid() {
@@ -214,238 +510,7 @@ void DrawGems(int cells[cell_no][cell_no]) {
     }
     
 }
-void letters(char chr, int x1, int x2, int y1, int y2, int size, int R, int G = 0, int B = 0) {
-    x1 += 5;
-    x2 -= 5;
-    y1 += 5;
-    y2 -= 5;
-    int mid_x = (x1 + x2) / 2;
-    int mid_y = (y1 + y2) / 2;
 
-    if (chr == 'A') {
-        myLine(mid_x, y1, x1, y2, R);
-        myLine(mid_x, y1, x2, y2, R);
-        myLine(x1 + 2, mid_y + size / 2, x2 - 3, mid_y + size / 2, R);
-    }
-    else if (chr == 'B') {
-        myLine(x1, y1, x1, y2, R);
-        myLine(x1, y1, mid_x + size / 4, y1 + size / 8, R);
-        myLine(mid_x + size / 4, y1 + size / 8, mid_x, mid_y, R);
-        myLine(x1, mid_y, mid_x, mid_y, R);
-        myLine(mid_x, mid_y, x2, mid_y + size / 4, R);
-        myLine(x2, mid_y + size / 4, mid_x + size / 8, y2, R);
-        myLine(mid_x + size / 8, y2, x1, y2, R);
-    }
-    else if (chr == 'C') {
-        myLine(x1, y1, x1, y2, R);
-        myLine(x1, y1, x2, y1, R);
-        myLine(x2, y1, x2, y1 + size / 4, R);
-        myLine(x2, y2, x2, y2 - size / 4, R);
-        myLine(x1, y2, x2, y2, R);
-    }
-    else if (chr == 'D') {
-        myLine(x1, y1, x1, y2, R);
-        myLine(x1, y1, mid_x + size / 4, y1 + size / 4, R);
-        myLine(mid_x + size / 4, y1 + size / 4, mid_x + size / 4, y2 - size / 4, R);
-        myLine(mid_x + size / 4, y2 - size / 4, x1, y2, R);
-    }
-    else if (chr == 'E') {
-        myLine(x1, y1, x1, y2, R);
-        myLine(x1, y1, x2, y1, R);
-        myLine(x1, mid_y, x2, mid_y, R);
-        myLine(x1, y2, x2, y2, R);
-    }
-    else if (chr == 'F') {
-        myLine(x1, y1, x1, y2, R);
-        myLine(x1, y1, x2, y1, R);
-        myLine(x1, mid_y, x2, mid_y, R);
-    }
-    else if (chr == 'G') {
-        myLine(x1, y1, x1, y2, R);
-        myLine(x1, y1, x2, y1, R);
-        myLine(x2, y1, x2, y1 + size / 4, R);
-        myLine(x2, y2, x2, y2 - size / 2, R);
-        myLine(x2, y2 - size / 2, mid_x, y2 - size / 2, R);
-        myLine(x1, y2, x2, y2, R);
-    }
-    else if (chr == 'H') {
-        myLine(x1, y1, x1, y2, R);
-        myLine(x2, y1, x2, y2, R);
-        myLine(x1, mid_y, x2, mid_y, R);
-    }
-    else if (chr == 'I') {
-        myLine(mid_x, y1, mid_x, y2, R);
-        myLine(x1, y1, x2, y1, R);
-        myLine(x1, y2, x2, y2, R);
-    }
-    else if (chr == 'J') {
-        myLine(x2, y1, x2, y2, R);
-        myLine(x1, y1, x2, y1, R);
-        myLine(x2, y2, x1, y2, R);
-        myLine(x1, y2, x1, y2 - size / 2, R);
-    }
-    else if (chr == 'K') {
-        myLine(x1, y1, x1, y2, R);
-        myLine(x1, mid_y, x2, y1, R);
-        myLine(x1, mid_y, x2, y2, R);
-    }
-    else if (chr == 'L') {
-        myLine(x1, y1, x1, y2, R);
-        myLine(x1, y2, x2, y2, R);
-    }
-    else if (chr == 'M') {
-        myLine(x1, y1, x1, y2, R);
-        myLine(x1, y1, mid_x, mid_y, R);
-        myLine(mid_x, mid_y, x2, y1, R);
-        myLine(x2, y1, x2, y2, R);
-    }
-    else if (chr == 'N') {
-        myLine(x1, y1, x1, y2, R);
-        myLine(x1, y1, x2, y2, R);
-        myLine(x2, y1, x2, y2, R);
-    }
-    else if (chr == 'O') {
-        myLine(x1, y1, x1, y2, R);
-        myLine(x1, y1, x2, y1, R);
-        myLine(x1, y2, x2, y2, R);
-        myLine(x2, y1, x2, y2, R);
-    }
-    else if (chr == 'P') {
-        myLine(x1, y1, x1, y2, R);
-        myLine(x1, y1, mid_x + size / 4, y1 + size / 8, R);
-        myLine(mid_x + size / 4, y1 + size / 8, mid_x, mid_y, R);
-        myLine(x1, mid_y, mid_x, mid_y, R);
-
-    }
-    else if (chr == 'Q') {
-        myLine(x1, y1, x1, y2 - 5, R);
-        myLine(x1, y1, mid_x + 3, y1, R);
-        myLine(mid_x + 3, y1, mid_x + 3, y2 - 5, R);
-        myLine(x1, y2 - 5, mid_x + 3, y2 - 5, R);
-        myLine(mid_x - 2, mid_y, mid_x + 3, y2 - 5, R);
-        myLine(mid_x + 3, y2 - 5, x2, y2, R);
-    }
-    else if (chr == 'R') {
-        myLine(x1, y1, x1, y2, R);
-        myLine(x1, y1, mid_x + size / 4, y1 + size / 8, R);
-        myLine(mid_x + size / 4, y1 + size / 8, mid_x, mid_y, R);
-        myLine(x1, mid_y, mid_x, mid_y, R);
-        myLine(mid_x, mid_y, x2, y2, R);
-    }
-    else if (chr == 'S') {
-        myLine(mid_x, y1, x2, y1 + size / 2, R);
-        myLine(mid_x, y1, x1, y1 + size / 2, R);
-        myLine(x1, y1 + size / 2, x2, y2 - size / 2, R);
-        myLine(x2, y2 - size / 2, mid_x, y2, R);
-        myLine(mid_x, y2, x1, y2 - size / 2, R);
-    }
-    else if (chr == 'T') {
-        myLine(mid_x, y1, mid_x, y2, R);
-        myLine(x1, y1, x2, y1, R);
-    }
-    else if (chr == 'U') {
-        myLine(x1, y1, x1, y2, R);
-        myLine(x1, y2, x2, y2, R);
-        myLine(x2, y1, x2, y2, R);
-
-    }
-    else if (chr == 'V') {
-        myLine(x1, y1, mid_x, y2, R);
-        myLine(mid_x, y2, x2, y1, R);
-    }
-    else if (chr == 'W') {
-        myLine(x1, y1, mid_x - size / 8, y2, R);
-        myLine(mid_x - size / 8, y2, mid_x, mid_y, R);
-        myLine(mid_x, mid_y, mid_x + size / 8, y2, R);
-        myLine(mid_x + size / 8, y2, x2, y1, R);
-    }
-    else if (chr == 'X') {
-        myLine(x1, y1, x2, y2, R);
-        myLine(x2, y1, x1, y2, R);
-
-    }
-    else if (chr == 'Y') {
-        myLine(x1, y1, mid_x, mid_y, R);
-        myLine(x2, y1, x1, y2, R);
-    }
-    else if (chr == 'Z') {
-        myLine(x1, y1, x2, y1, R);
-        myLine(x2, y1, x1, y2, R);
-        myLine(x1, y2, x2, y2, R);
-    }
-    else if (chr == '.') {
-        myRect(x2, y2 - size / 8, mid_x + size / 4, y2, 255, 255, 255);
-    }
-    else if (chr == ',') {
-        myRect(x2, y2 - size / 3, mid_x + size / 4, y2 - size / 6, 255, 255, 255);
-        myLine(x2, y2 - size / 3, x2, y2, R);
-        myLine(x2, y2, mid_x + size / 4, y2, R);
-    }
-    else if (chr == '!') {
-        myRect(mid_x - size / 8, y1, mid_x - 1, y2 - size / 3, 255, 255, 255);
-        myRect(mid_x - size / 8, y2 - size / 8, mid_x, y2, 255, 255, 255);
-    }
-    else if (chr == ':') {
-        myRect(x2, y2 - 20, mid_x + size / 4, y2 - 16, 255, 255, 255);
-        myRect(x2, y2 - 4, mid_x + size / 4, y2, 255, 255, 255);
-    }
-    else if (chr == '1') {
-        myLine(x1, mid_y - size / 2, mid_x, y1, R);
-        myLine(mid_x, y1, mid_x, y2, R);
-        myLine(x1, y2, x2, y2, R);
-    }
-    else if (chr == '2') {
-        myLine(x1, y1, x2, y1, R);
-        myLine(x2, y1, x2, mid_y, R);
-        myLine(x2, mid_y, x1, mid_y, R);
-        myLine(x1, mid_y, x1, y2, R);
-        myLine(x1, y2, x2, y2, R);
-    }
-    else if (chr == '3') {
-        myLine(x1, y1, x2, y1, R);
-        myLine(x2, y1, x2, mid_y, R);
-        myLine(x2, mid_y, x1, mid_y, R);
-        myLine(x2, mid_y, x2, y2, R);
-        myLine(x2, y2, x1, y2, R);
-    }
-    else if (chr == '4') {
-        myLine(x1, y1, x1, mid_y, R);
-        myLine(x1, mid_y, x2, mid_y, R);
-        myLine(mid_x + size / 6, y1, mid_x + size / 6, y2, R);
-    }
-    else if (chr == '5') {
-        myLine(x1, y1, x2, y1, R);
-        myLine(x1, y1, x1, mid_y, R);
-        myLine(x1, mid_y, x2, mid_y, R);
-        myLine(x2, mid_y, x2, y2, R);
-        myLine(x2, y2, x1, y2, R);
-    }
-    else if (chr == '6') {
-        myLine(x1, y1, x2, y1, R);
-        myLine(x1, y1, x1, y2, R);
-        myLine(x1, mid_y, x2, mid_y, R);
-        myLine(x2, mid_y, x2, y2, R);
-        myLine(x2, y2, x1, y2, R);
-    }
-    else if (chr == '7') {
-        myLine(x1, y1, x2, y1, R);
-        myLine(x2, y1, x2, y2, R);
-    }
-    else if (chr == '8') {
-        myLine(x1, y1, x2, y1, R);
-        myLine(x1, y1, x1, y2, R);
-        myLine(x1, mid_y, x2, mid_y, R);
-        myLine(x2, y1, x2, y2, R);
-        myLine(x2, y2, x1, y2, R);
-    }
-    else if (chr == '9') {
-        myLine(x1, y1, x2, y1, R);
-        myLine(x1, y1, x1, mid_y, R);
-        myLine(x1, mid_y, x2, mid_y, R);
-        myLine(x2, y1, x2, y2, R);
-        myLine(x2, y2, x1, y2, R);
-    }
-}
 bool isGeneratedDuplicates(int cells[cell_no][cell_no], int i, int j) {
     bool flag = false;
     if (i != 0 && cells[i][j] == cells[i - 1][j])
@@ -1039,7 +1104,7 @@ int main() {
 
 
     int keyboard_key;
-    bool key_pressed, is_selected = false;
+    bool key_pressed, is_selected = false, isNum = true;
     int x = start_x, y = start_y, cell_x = 0, cell_y = 0, selected_x = -1, selected_y = -1;
 
     system("@echo off");
@@ -1047,13 +1112,11 @@ int main() {
 
     int cells[cell_no][cell_no] = {};
 
-
     randomizer(cells);
     DrawGems(cells);
     DrawGrid();
     myRect(x, y, x + cell_size, y + cell_size, 255, 0, 0);
     DrawGems(cells);
-
 
     while (1) {
         updateCells(cells);
