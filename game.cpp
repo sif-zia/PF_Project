@@ -324,10 +324,10 @@ void printPoints(int Points) {
     int size = 25;
     int R, G, B;
     R = G = B = 255;
-    int timer_x = start_x + (cell_no + 1) * (cell_size);
-    int timer_y = start_y + 3 * (cell_size);
-    drawText(25, timer_x, timer_y, 0, 0, 0, pre_rec_msgs[0]);
-    drawText(25, timer_x, timer_y, R, G, B, pre_rec_msgs[3], true, Points);
+    int points_x = start_x + (cell_no + 1) * (cell_size);
+    int points_y = start_y + 3 * (cell_size);
+    drawText(25, points_x, points_y, 0, 0, 0, pre_rec_msgs[0]);
+    drawText(25, points_x, points_y, R, G, B, pre_rec_msgs[3], true, Points);
 }
 
 void printTime(int mins, int secs, bool time_out) {
@@ -1176,7 +1176,7 @@ int main() {
 
     int keyboard_key;
     bool key_pressed, is_selected = false, updated = false;
-    int x = start_x, y = start_y, cell_x = 0, cell_y = 0, selected_x = -1, selected_y = -1, mins = 1, secs = 0;
+    int x = start_x, y = start_y, cell_x = 0, cell_y = 0, selected_x = -1, selected_y = -1, mins = 2, secs = 0;
 
     system("@echo off");
     system("mode 800");
@@ -1190,10 +1190,6 @@ int main() {
     DrawGems(cells);
     
     bool time_out = timer(mins, secs, updated, true);
-
-    key_pressed = isCursorKeyPressed(keyboard_key);
-    while (!(key_pressed == true && keyboard_key == 5))
-        key_pressed = isCursorKeyPressed(keyboard_key);
 
     while (time_out == false) {
         updateCells(cells);
