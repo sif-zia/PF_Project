@@ -15,10 +15,16 @@ const int cell_no = 8;
 const int speed = 25;
 int end_x = start_x + cell_no * cell_size;
 int end_y = start_y + cell_no * cell_size;
-int points = 0;
+int points = 0, Points = 0;
 auto current = std::chrono::high_resolution_clock::now();
 auto printed = current;
-
+bool isNum = true;
+char pre_rec_msgs[6][50] = { "---------------------------------",
+                             "Press Enter to Start!",
+                             "Time Remaining: ",
+                             "Points: ",
+                             "Game Over! Press Escape to Exit!"
+};
 
 void lettersnNumbers(char chr, int x1, int x2, int y1, int y2, int size, int R = 0, int G = 0, int B = 0) {
     x1 += 5;
@@ -268,14 +274,16 @@ void Capitalizer(char text[]) {
             text[i] -= 32;
 }
 
-void drawText(int size, int start_x, int start_y, int R, int G, int B, char text[], bool& isNum, int num = 0) {
+void drawText(int size, int start_x, int start_y, int R, int G, int B, char text[], bool isNum = false, int num = 0) {
     int idx = 0;
     int idx_x = 0;
     int idx_y = 0;
     int x1, x2, y1, y2;
     int digit_count = 0;
     int len = strlen(text);
+    char temp[100];
 
+    strcpy_s(temp, text);
     if (isNum == true) {
         int reverse_num = 0;
         int i;
@@ -284,15 +292,14 @@ void drawText(int size, int start_x, int start_y, int R, int G, int B, char text
             reverse_num = (reverse_num * 10) + num % 10;
 
         for (i = len; i - len < digit_count; i++, reverse_num /= 10)
-            text[i] = (reverse_num % 10) + 48;
+            temp[i] = (reverse_num % 10) + 48;
 
-        text[i] = '\0';
-        isNum = false;
+        temp[i] = '\0';
     }
 
-    Capitalizer(text);
+    Capitalizer(temp);
 
-    for (idx = 0; idx < strlen(text); idx++)
+    for (idx = 0; idx < strlen(temp); idx++)
     {
         x1 = start_x + size * idx_x;
         x2 = start_x + size * (idx_x + 1);
@@ -307,10 +314,20 @@ void drawText(int size, int start_x, int start_y, int R, int G, int B, char text
 
         y1 = start_y + 2 * size * idx_y;
         y2 = start_y + 2 * size * (idx_y + 1);
-        lettersnNumbers(text[idx], x1, x2, y1, y2, size, R, G, B);
+        lettersnNumbers(temp[idx], x1, x2, y1, y2, size, R, G, B);
         idx_x++;
     }
 
+}
+
+void printPoints(int Points) {
+    int size = 25;
+    int R, G, B;
+    R = G = B = 255;
+    int timer_x = start_x + (cell_no + 1) * (cell_size);
+    int timer_y = start_y + 3 * (cell_size);
+    drawText(25, timer_x, timer_y, 0, 0, 0, pre_rec_msgs[0]);
+    drawText(25, timer_x, timer_y, R, G, B, pre_rec_msgs[3], true, Points);
 }
 
 void printTime(int mins, int secs, bool time_out) {
@@ -359,14 +376,8 @@ void printTime(int mins, int secs, bool time_out) {
         lettersnNumbers((secs % 10) + 48, x1, x2, y1, y2, size, R, G, B);
     }
     else {
-        char text[] = "Game Over! Press Escape to Exit!";
-        Capitalizer(text); int i = 0;
-        for (; i < strlen(text); i++) {
-            x1 = timer_x + size * i;
-            x2 = timer_x + size * (i + 1);
-            lettersnNumbers('-', x1, x2, y1, y2, size);
-            lettersnNumbers(text[i], x1, x2, y1, y2, size, R, G, B);
-        }
+        drawText(size, timer_x, timer_y, 0, 0, 0, pre_rec_msgs[0]);
+        drawText(size, timer_x, timer_y, R, G, B, pre_rec_msgs[4]);
     }
 }
 
@@ -1164,7 +1175,7 @@ int main() {
 
 
     int keyboard_key;
-    bool key_pressed, is_selected = false, isNum = true, updated = false;
+    bool key_pressed, is_selected = false, updated = false;
     int x = start_x, y = start_y, cell_x = 0, cell_y = 0, selected_x = -1, selected_y = -1, mins = 1, secs = 0;
 
     system("@echo off");
@@ -1180,9 +1191,15 @@ int main() {
     
     bool time_out = timer(mins, secs, updated, true);
 
+    key_pressed = isCursorKeyPressed(keyboard_key);
+    while (!(key_pressed == true && keyboard_key == 5))
+        key_pressed = isCursorKeyPressed(keyboard_key);
+
     while (time_out == false) {
         updateCells(cells);
         time_out = timer(mins, secs, updated);
+        if (updated == true)
+            printPoints(points);
         key_pressed = isCursorKeyPressed(keyboard_key);
         
 
@@ -1233,9 +1250,7 @@ int main() {
 
     }
     key_pressed = isCursorKeyPressed(keyboard_key);
-    while (key_pressed != true && keyboard_key != 7)
+    while (!(key_pressed == true && keyboard_key == 7))
         key_pressed = isCursorKeyPressed(keyboard_key);
-
-    cin.get();
     return 0;
 }
