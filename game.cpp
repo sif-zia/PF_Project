@@ -20,7 +20,7 @@ auto current = std::chrono::high_resolution_clock::now();
 auto printed = current;
 
 
-void letters(char chr, int x1, int x2, int y1, int y2, int size, int R = 0, int G = 0, int B = 0) {
+void lettersnNumbers(char chr, int x1, int x2, int y1, int y2, int size, int R = 0, int G = 0, int B = 0) {
     x1 += 5;
     x2 -= 5;
     y1 += 5;
@@ -195,6 +195,13 @@ void letters(char chr, int x1, int x2, int y1, int y2, int size, int R = 0, int 
         myRect(x2, y2 - 20, mid_x + size / 4, y2 - 16, R, G, B);
         myRect(x2, y2 - 4, mid_x + size / 4, y2, R, G, B);
     }
+    else if (chr == '0') {
+        myLine(x1, y1, x2, y1, R);
+        myLine(x1, y1, x1, y2, R);
+        myLine(x2, y1, x2, y2, R);
+        myLine(x1, y2, x2, y2, R);
+        myLine(x2, y1, x1, y2, R);
+    }
     else if (chr == '1') {
         myLine(x1, mid_y - size / 2, mid_x, y1, R, G, B);
         myLine(mid_x, y1, mid_x, y2, R, G, B);
@@ -300,7 +307,7 @@ void drawText(int size, int start_x, int start_y, int R, int G, int B, char text
 
         y1 = start_y + 2 * size * idx_y;
         y2 = start_y + 2 * size * (idx_y + 1);
-        letters(text[idx], x1, x2, y1, y2, size, R, G, B);
+        lettersnNumbers(text[idx], x1, x2, y1, y2, size, R, G, B);
         idx_x++;
     }
 
@@ -324,32 +331,32 @@ void printTime(int mins, int secs, bool time_out) {
         for (; i < strlen(text); i++) {
             x1 = timer_x + size * i;
             x2 = timer_x + size * (i + 1);
-            letters(text[i], x1, x2, y1, y2, size, R, G, B);
+            lettersnNumbers(text[i], x1, x2, y1, y2, size, R, G, B);
         }
         x1 = timer_x + size * i;
         x2 = timer_x + size * (i + 1);
-        letters('-', x1, x2, y1, y2, size);
-        letters((mins / 10) + 48, x1, x2, y1, y2, size, R, G, B);
+        lettersnNumbers('-', x1, x2, y1, y2, size);
+        lettersnNumbers((mins / 10) + 48, x1, x2, y1, y2, size, R, G, B);
         i++;
         x1 = timer_x + size * i;
         x2 = timer_x + size * (i + 1);
-        letters('-', x1, x2, y1, y2, size);
-        letters((mins % 10) + 48, x1, x2, y1, y2, size, R, G, B);
+        lettersnNumbers('-', x1, x2, y1, y2, size);
+        lettersnNumbers((mins % 10) + 48, x1, x2, y1, y2, size, R, G, B);
         i++;
         x1 = timer_x + size * i;
         x2 = timer_x + size * (i + 1);
-        letters('-', x1, x2, y1, y2, size);
-        letters(':', x1, x2, y1, y2, size, R, G, B);
+        lettersnNumbers('-', x1, x2, y1, y2, size);
+        lettersnNumbers(':', x1, x2, y1, y2, size, R, G, B);
         i++;
         x1 = timer_x + size * i;
         x2 = timer_x + size * (i + 1);
-        letters('-', x1, x2, y1, y2, size);
-        letters((secs / 10) + 48, x1, x2, y1, y2, size, R, G, B);
+        lettersnNumbers('-', x1, x2, y1, y2, size);
+        lettersnNumbers((secs / 10) + 48, x1, x2, y1, y2, size, R, G, B);
         i++;
         x1 = timer_x + size * i;
         x2 = timer_x + size * (i + 1);
-        letters('-', x1, x2, y1, y2, size);
-        letters((secs % 10) + 48, x1, x2, y1, y2, size, R, G, B);
+        lettersnNumbers('-', x1, x2, y1, y2, size);
+        lettersnNumbers((secs % 10) + 48, x1, x2, y1, y2, size, R, G, B);
     }
     else {
         char text[] = "Game Over! Press Escape to Exit!";
@@ -357,8 +364,8 @@ void printTime(int mins, int secs, bool time_out) {
         for (; i < strlen(text); i++) {
             x1 = timer_x + size * i;
             x2 = timer_x + size * (i + 1);
-            letters('-', x1, x2, y1, y2, size);
-            letters(text[i], x1, x2, y1, y2, size, R, G, B);
+            lettersnNumbers('-', x1, x2, y1, y2, size);
+            lettersnNumbers(text[i], x1, x2, y1, y2, size, R, G, B);
         }
     }
 }
