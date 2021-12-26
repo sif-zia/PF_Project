@@ -1,6 +1,5 @@
 #include <iostream>
 #include "help.h"
-#include <windows.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctime>
@@ -793,7 +792,7 @@ void fillEmptyCells(int cells[cell_no][cell_no]) {
                 shiftGemsDown(cells, pos_x, pos_y);
 }
 
-bool isVerticalElbowFormed(int cells[cell_no][cell_no], int x, int y, int& elbow_x, int& elbow_y) {
+bool isElbowFormed(int cells[cell_no][cell_no], int x, int y, int& elbow_x, int& elbow_y) {
     bool elbowfound = false;
     for (int i = y; i >= y - 2; i--) {
         if (areGemsSame(cells[x][i], cells[x + 1][i]) == true && areGemsSame(cells[x + 1][i], cells[x + 2][i]) == true) {
@@ -828,7 +827,7 @@ bool isVerticalElbowFormed(int cells[cell_no][cell_no], int x, int y, int& elbow
         gem(0, x + 1, y - 2);
         points += 100;
     }
-    if (areGemsSame(cells[x - 1][y - 2], cells[x][y - 2]) == true && areGemsSame(cells[x][y - 2], cells[x + 1][y - 2]) == true && !elbowfound) {
+    if (areGemsSame(cells[x - 1][y], cells[x][y]) == true && areGemsSame(cells[x][y], cells[x + 1][y]) == true && !elbowfound) {
         elbowfound = true;
         elbow_x = x;
         elbow_y = y;
@@ -845,12 +844,12 @@ void deleteColDuplicate(int cells[cell_no][cell_no], int col) {
     int count = 1;
     int elbow_x, elbow_y;
     int Gem;
-    for (int y = 1; y < cell_no; y++) {
-        if (areGemsSame(cells[col][y], cells[col][y - 1]) == true)
+    for (int y = 1; y <= cell_no; y++) {
+        if (areGemsSame(cells[col][y], cells[col][y - 1]) == true && y != cell_no)
             count++;
         else {
-            if (count == 3) { // Delete Three Consective Gems in a row
-                if (isVerticalElbowFormed(cells, col, y - 1, elbow_x, elbow_y) == true) {
+            if (count == 3) { // Delete Three Consective Gems in a column
+                if (isElbowFormed(cells, col, y - 1, elbow_x, elbow_y) == true) {
                     Gem = cells[elbow_x][elbow_y];
                     for (int i = 1; i <= 3; i++) {
                         gem(0, col, y - i);
@@ -863,6 +862,7 @@ void deleteColDuplicate(int cells[cell_no][cell_no], int col) {
                         Gem %= 6;
                         cells[elbow_x][elbow_y] = Gem + 12;
                     }
+                    gem(cells[elbow_x][elbow_y], elbow_x, elbow_y);
                 }
                 else {
                     for (int i = 1; i <= 3; i++) {
@@ -877,6 +877,7 @@ void deleteColDuplicate(int cells[cell_no][cell_no], int col) {
                 for (int i = 1; i <= count; i++) {
                     if (cells[col][y - i] < 6 && flame_inserted == false) {
                         gem(0, col, y - i);
+                        cells[col][y - i] %= 6;
                         cells[col][y - i] += 6;
                         gem(cells[col][y - i], col, y - i);
                         points += 50;
@@ -892,132 +893,27 @@ void deleteColDuplicate(int cells[cell_no][cell_no], int col) {
             count = 1;
         }
     }
-    if (count == 3) {  // Delete Three Consective Gems at the end of row
-        if (isVerticalElbowFormed(cells, col, cell_no - 1, elbow_x, elbow_y) == true) {
-            Gem = cells[elbow_x][elbow_y];
-            for (int i = 1; i <= 3; i++) {
-                gem(0, col, cell_no - i);
-                deleteCell(cells, col, cell_no - i);
-                points += 50;
-            }
-            if (Gem < 6)
-                cells[elbow_x][elbow_y] = Gem + 12;
-            else {
-                Gem %= 6;
-                cells[elbow_x][elbow_y] = Gem + 12;
-            }
-        }
-        else {
-            for (int i = 1; i <= 3; i++) {
-                gem(0, col, cell_no - i);
-                deleteCell(cells, col, cell_no - i);
-                points += 50;
-            }
-        }
-    }
-    else if (count >= 4) { // Delete Four or more Consective Gems at the end of a row and adding a flame gem
-        bool flame_inserted = false;
-        for (int i = 1; i <= count; i++) {
-            if (cells[col][cell_no - i] < 6 && flame_inserted == false) {
-                gem(0, col, cell_no - i);
-                cells[col][cell_no - i] += 6;
-                gem(cells[col][cell_no - i], col, cell_no - i);
-                points += 50;
-                flame_inserted = true;
-            }
-            else {
-                gem(0, col, cell_no - i);
-                deleteCell(cells, col, cell_no - i);
-                points += 50;
-            }
-        }
-    }
-}
-
-bool isHorizontalElbowFormed(int cells[cell_no][cell_no], int x, int y, int& elbow_x, int& elbow_y) {
-    bool elbowfound = false;
-    for (int i = x; i >= x - 2; i--) {
-        if (areGemsSame(cells[i][y], cells[i][y+1]) == true && areGemsSame(cells[i][y+1], cells[i][y+2]) == true) {
-            elbowfound = true;
-            elbow_x = x;
-            elbow_y = i;
-            deleteCell(cells, i, y+1);
-            gem(0, i, y + 1);
-            deleteCell(cells, i, y+2);
-            gem(0, i, y + 2);
-            points += 100;
-        }
-        if (areGemsSame(cells[i][y], cells[i][y - 1]) == true && areGemsSame(cells[i][y - 1], cells[i][y - 2]) == true && !elbowfound) {
-            elbowfound = true;
-            elbow_x = x;
-            elbow_y = i;
-            deleteCell(cells, i, y - 1);
-            gem(0, i, y - 1);
-            deleteCell(cells, i, y - 2);
-            gem(0, i, y - 2);
-            points += 100;
-        }
-    }
-    if (areGemsSame(cells[x - 2][y - 1], cells[x - 2][y]) == true && areGemsSame(cells[x - 2][y], cells[x - 2][y + 1]) == true){
-        elbowfound = true;
-        elbow_x = x - 2;
-        elbow_y = y;
-        deleteCell(cells, x - 2, y - 1);
-        gem(0, x - 2, y - 1);
-        deleteCell(cells, x - 2, y + 1);
-        gem(0, x - 2, y + 1);
-        points += 100;
-    }
-    if (areGemsSame(cells[x][y - 1], cells[x][y]) == true && areGemsSame(cells[x][y], cells[x][y + 1]) == true && !elbowfound) {
-        elbowfound = true;
-        elbow_x = x;
-        elbow_y = y;
-        deleteCell(cells, x, y - 1);
-        gem(0, x, y - 1);
-        deleteCell(cells, x, y + 1);
-        gem(0, x, y + 1);
-        points += 100;
-    }
-    return elbowfound;
 }
 
 void deleteRowDuplicate(int cells[cell_no][cell_no], int row) {
     int count = 1;
-    int elbow_x, elbow_y;
-    int Gem;
-    for (int x = 1; x < cell_no; x++) {
-        if (areGemsSame(cells[x][row], cells[x - 1][row]) == true)
+    for (int x = 1; x <= cell_no; x++) {
+        if (areGemsSame(cells[x][row], cells[x - 1][row]) == true && x != cell_no)
             count++;
         else {
-            if (count == 3) { // Delete Three Consective Gems in a column
-                if (isHorizontalElbowFormed(cells, x - 1, row, elbow_x, elbow_y)) {
-                    Gem = cells[elbow_x][elbow_y];
-                    for (int i = 1; i <= 3; i++) {
-                        gem(0, x - i, row);
-                        deleteCell(cells, x - i, row);
-                        points += 50;
-                    }
-                    if (Gem < 6)
-                        cells[elbow_x][elbow_y] = Gem + 12;
-                    else {
-                        Gem %= 6;
-                        cells[elbow_x][elbow_y] = Gem + 12;
-                    }
-
-                }
-                else {
-                    for (int i = 1; i <= 3; i++) {
-                        gem(0, x - i, row);
-                        deleteCell(cells, x - i, row);
-                        points += 50;
-                    }
+            if (count == 3) { // Delete Three Consective Gems in a row
+                for (int i = 1; i <= 3; i++) {
+                    gem(0, x - i, row);
+                    deleteCell(cells, x - i, row);
+                    points += 50;
                 }
             }
-            else if (count >= 4) {// Delete Four or more Consective Gems in a column and adding a flame gem
+            else if (count >= 4) {// Delete Four or more Consective Gems in a row and adding a flame gem
                 bool flame_inserted = false;
                 for (int i = 1; i <= count; i++) {
                     if (cells[x - i][row] < 6 && flame_inserted == false) {
                         gem(0, x - i, row);
+                        cells[x - i][row] %= 6;
                         cells[x - i][row] += 6;
                         gem(cells[x - i][row], x - i, row);
                         points += 50;
@@ -1031,47 +927,6 @@ void deleteRowDuplicate(int cells[cell_no][cell_no], int row) {
                 }
             }
             count = 1;
-        }
-    }
-    if (count == 3) {// Delete Three Consective Gems at the end of column
-        if (isHorizontalElbowFormed(cells, cell_no - 1, row, elbow_x, elbow_y)) {
-            Gem = cells[elbow_x][elbow_y];
-            for (int i = 1; i <= 3; i++) {
-                gem(0, cell_no - i, row);
-                deleteCell(cells, cell_no - i, row);
-                points += 50;
-            }
-            if (Gem < 6)
-                cells[elbow_x][elbow_y] = Gem + 12;
-            else {
-                Gem %= 6;
-                cells[elbow_x][elbow_y] = Gem + 12;
-            }
-
-        }
-        else {
-            for (int i = 1; i <= 3; i++) {
-                gem(0, cell_no - i, row);
-                deleteCell(cells, cell_no - i, row);
-                points += 50;
-            }
-        }
-    }
-    else if (count >= 4) {// Delete Four or more Consective Gems at the end of a column and adding a flame gem
-        bool flame_inserted = false;
-        for (int i = 1; i <= count; i++) {
-            if (cells[cell_no - i][row] < 6 && flame_inserted == false) {
-                gem(0, cell_no - i, row);
-                cells[cell_no - i][row] += 6;
-                gem(cells[cell_no - i][row], cell_no - i, row);
-                points += 50;
-                flame_inserted = true;
-            }
-            else {
-                gem(0, cell_no - i, row);
-                deleteCell(cells, cell_no - i, row);
-                points += 50;
-            }
         }
     }
 }
@@ -1176,7 +1031,7 @@ int main() {
 
     int keyboard_key;
     bool key_pressed, is_selected = false, updated = false;
-    int x = start_x, y = start_y, cell_x = 0, cell_y = 0, selected_x = -1, selected_y = -1, mins = 2, secs = 0;
+    int x = start_x, y = start_y, cell_x = 0, cell_y = 0, selected_x = -1, selected_y = -1, mins = 15, secs = 0;
 
     system("@echo off");
     system("mode 800");
@@ -1188,9 +1043,11 @@ int main() {
     DrawGrid();
     myRect(x, y, x + cell_size, y + cell_size, 255, 0, 0);
     DrawGems(cells);
-    
+    printPoints(points);
+
     bool time_out = timer(mins, secs, updated, true);
 
+    printTime(mins, secs, time_out);
     while (time_out == false) {
         updateCells(cells);
         time_out = timer(mins, secs, updated);
