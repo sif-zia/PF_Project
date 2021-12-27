@@ -20,7 +20,7 @@ auto printed = current;
 bool isNum = true;
 char pre_rec_msgs[6][50] = { "---------------------------------",
                              "Press Enter to Start!",
-                             "Time Remaining: ",
+                             "Time Remaining: --:--",
                              "Points: ",
                              "Game Over! Press Escape to Exit!"
 };
@@ -264,7 +264,7 @@ void lettersnNumbers(char chr, int x1, int x2, int y1, int y2, int size, int R =
         myLine(x2, y2, x1, y2, R, G, B);
     }
     else if (chr == '-')
-        myRect(x1-5, y1-5, x2+5, y2+5, R, G, B);
+        myRect(x1-5, y1-5, x2+5, y2+5, 0, 0, 0);
 }
 
 void Capitalizer(char text[]) {
@@ -333,49 +333,24 @@ void printTime(int mins, int secs, bool time_out) {
     int size = 25;
     int R, G, B;
     R = G = B = 255;
-    int timer_x = start_x + (cell_no + 1) * (cell_size), x1, x2, y1, y2;
+    int timer_x = start_x + (cell_no + 1) * (cell_size);
     int timer_y = start_y + 2 * (cell_size);
+    char temp[50];
 
-    y1 = timer_y;
-    y2 = timer_y + 2 * size;
     if (time_out == false) {
-
-        char text[75] = "Time Remaining: ";
-        Capitalizer(text);
-        int i = 0;
-
-        for (; i < strlen(text); i++) {
-            x1 = timer_x + size * i;
-            x2 = timer_x + size * (i + 1);
-            lettersnNumbers(text[i], x1, x2, y1, y2, size, R, G, B);
-        }
-        x1 = timer_x + size * i;
-        x2 = timer_x + size * (i + 1);
-        lettersnNumbers('-', x1, x2, y1, y2, size);
-        lettersnNumbers((mins / 10) + 48, x1, x2, y1, y2, size, R, G, B);
-        i++;
-        x1 = timer_x + size * i;
-        x2 = timer_x + size * (i + 1);
-        lettersnNumbers('-', x1, x2, y1, y2, size);
-        lettersnNumbers((mins % 10) + 48, x1, x2, y1, y2, size, R, G, B);
-        i++;
-        x1 = timer_x + size * i;
-        x2 = timer_x + size * (i + 1);
-        lettersnNumbers('-', x1, x2, y1, y2, size);
-        lettersnNumbers(':', x1, x2, y1, y2, size, R, G, B);
-        i++;
-        x1 = timer_x + size * i;
-        x2 = timer_x + size * (i + 1);
-        lettersnNumbers('-', x1, x2, y1, y2, size);
-        lettersnNumbers((secs / 10) + 48, x1, x2, y1, y2, size, R, G, B);
-        i++;
-        x1 = timer_x + size * i;
-        x2 = timer_x + size * (i + 1);
-        lettersnNumbers('-', x1, x2, y1, y2, size);
-        lettersnNumbers((secs % 10) + 48, x1, x2, y1, y2, size, R, G, B);
+        strcpy_s(temp, pre_rec_msgs[2]);
+        drawText(size, timer_x, timer_y, R, G, B, temp);
+        int len = strlen(temp) - 5;
+        temp[len] = mins / 10 + 48;
+        temp[len+1] = mins % 10 + 48;
+        temp[len + 2] = ':';
+        temp[len+3] = secs / 10 + 48;
+        temp[len+4] = secs % 10 + 48;
+        temp[len+5] = '\0';
+        drawText(size, timer_x, timer_y, R, G, B, temp);
     }
     else {
-        drawText(size, timer_x, timer_y, 0, 0, 0, pre_rec_msgs[0]);
+        drawText(size, timer_x, timer_y, R, G, B, pre_rec_msgs[0]);
         drawText(size, timer_x, timer_y, R, G, B, pre_rec_msgs[4]);
     }
 }
@@ -412,6 +387,32 @@ bool timer(int& mins, int& secs, bool& updated, bool start_timer = false) {
     current = std::chrono::high_resolution_clock::now();
 
     return time_out;
+}
+
+void stopwatch(int& mins, int& secs, bool& updated, bool start_timer = false) {
+
+    if (updated == true)
+        updated = false;
+
+    if (start_timer = true)
+        current = std::chrono::high_resolution_clock::now();
+
+    std::chrono::duration<float> time_passed = current - printed;
+
+    if (time_passed.count() >= 1) { // When one second has passed execute the following condition
+
+        secs++;
+        if (secs == 60)
+            mins++, secs = 0;
+
+        printed = current;
+        updated = true;
+    }
+
+    if (updated == true)
+        printTime(mins, secs, false);
+
+    current = std::chrono::high_resolution_clock::now();
 }
 
 void DrawGrid() {
@@ -1024,17 +1025,13 @@ void MoveSelectorDown(int& x, int& y, int& cell_x, int& cell_y) {
     }
 }
 
-int main() {
-
-    srand(time(0));
-
+void game(bool is_timed = true, int mins = 0, int secs = 0, int point_goal = 0, int str_points = 0) {
+    
+    points = str_points;
 
     int keyboard_key;
-    bool key_pressed, is_selected = false, updated = false;
-    int x = start_x, y = start_y, cell_x = 0, cell_y = 0, selected_x = -1, selected_y = -1, mins = 15, secs = 0;
-
-    system("@echo off");
-    system("mode 800");
+    bool key_pressed, is_selected = false, updated = false, time_out = false;
+    int x = start_x, y = start_y, cell_x = 0, cell_y = 0, selected_x = -1, selected_y = -1;
 
     int cells[cell_no][cell_no] = {};
 
@@ -1044,17 +1041,26 @@ int main() {
     myRect(x, y, x + cell_size, y + cell_size, 255, 0, 0);
     DrawGems(cells);
     printPoints(points);
-
-    bool time_out = timer(mins, secs, updated, true);
+    if (is_timed == true)
+        time_out = timer(mins, secs, updated, true);
+    else
+        stopwatch(mins, secs, updated, true);
 
     printTime(mins, secs, time_out);
-    while (time_out == false) {
+
+    while (time_out == false && (points <= point_goal && is_timed == false)) {
         updateCells(cells);
-        time_out = timer(mins, secs, updated);
+
+        if (is_timed == true)
+            time_out = timer(mins, secs, updated);
+        else
+            stopwatch(mins, secs, updated);
+
         if (updated == true)
             printPoints(points);
+
         key_pressed = isCursorKeyPressed(keyboard_key);
-        
+
 
         if (key_pressed == true && keyboard_key == 1) {
             MoveSelectorLeft(x, y, cell_x, cell_y);
@@ -1102,8 +1108,20 @@ int main() {
         }
 
     }
+
     key_pressed = isCursorKeyPressed(keyboard_key);
     while (!(key_pressed == true && keyboard_key == 7))
         key_pressed = isCursorKeyPressed(keyboard_key);
+}
+
+int main() {
+
+    srand(time(0));
+
+    system("@echo off");
+    system("mode 800");
+
+    game(false, 0, 0, 500);
+
     return 0;
 }
