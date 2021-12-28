@@ -18,11 +18,14 @@ int points = 0, Points = 0;
 auto current = std::chrono::high_resolution_clock::now();
 auto printed = current;
 bool isNum = true;
-char pre_rec_msgs[6][50] = { "---------------------------------",
-                             "Press Enter to Start!",
-                             "Time Remaining: --:--",
-                             "Points: ",
-                             "Game Over! Press Escape to Exit!"
+char pre_rec_msgs[8][50] = { "---------------------------------",   //0
+                             "Press Enter to Start!",               //1
+                             "Time Remaining: --:--",               //2
+                             "Points: ",                            //3
+                             "Game Over! Press Escape to Continue!",//4
+                             "Congrats! You Scored: ",              //5
+                             "You Failed! Better luck next time!",  //6
+                             "Congrats! You reached the goal!"      //7
 };
 
 void lettersnNumbers(char chr, int x1, int x2, int y1, int y2, int size, int R = 0, int G = 0, int B = 0) {
@@ -34,8 +37,8 @@ void lettersnNumbers(char chr, int x1, int x2, int y1, int y2, int size, int R =
     int mid_y = (y1 + y2) / 2;
 
     if (chr == 'A') {
-        myLine(mid_x, y1, x1, y2, R);
-        myLine(mid_x, y1, x2, y2, R);
+        myLine(mid_x, y1, x1, y2, R, G, B);
+        myLine(mid_x, y1, x2, y2, R, G, B);
         myLine(x1 + 2, mid_y + size / 2, x2 - 3, mid_y + size / 2, R, G, B);
     }
     else if (chr == 'B') {
@@ -201,11 +204,11 @@ void lettersnNumbers(char chr, int x1, int x2, int y1, int y2, int size, int R =
         myRect(x2, y2 - 4, mid_x + size / 4, y2, R, G, B);
     }
     else if (chr == '0') {
-        myLine(x1, y1, x2, y1, R);
-        myLine(x1, y1, x1, y2, R);
-        myLine(x2, y1, x2, y2, R);
-        myLine(x1, y2, x2, y2, R);
-        myLine(x2, y1, x1, y2, R);
+        myLine(x1, y1, x2, y1, R, G, B);
+        myLine(x1, y1, x1, y2, R, G, B);
+        myLine(x2, y1, x2, y2, R, G, B);
+        myLine(x1, y2, x2, y2, R, G, B);
+        myLine(x2, y1, x1, y2, R, G, B);
     }
     else if (chr == '1') {
         myLine(x1, mid_y - size / 2, mid_x, y1, R, G, B);
@@ -319,6 +322,22 @@ void drawText(int size, int start_x, int start_y, int R, int G, int B, char text
 
 }
 
+void game_over(bool point_based, int mins, int secs, int points, bool goal_reached = false) {
+    system("cls");
+    if (point_based == false) {
+        drawText(35, 200, 200, 100, 100, 255, pre_rec_msgs[5], true, points);
+        drawText(25, 200, 300, 100, 100, 255, pre_rec_msgs[4]);
+    }
+    else if (point_based == true && goal_reached == false) {
+        drawText(35, 200, 200, 255, 100, 100, pre_rec_msgs[6]);
+        drawText(25, 200, 300, 255, 100, 100, pre_rec_msgs[4]);
+    }
+    else if (point_based == true && goal_reached == true) {
+        drawText(35, 200, 200, 100, 255, 100, pre_rec_msgs[7]);
+        drawText(25, 200, 300, 100, 255, 100, pre_rec_msgs[4]);
+    }
+}
+
 void printPoints(int Points) {
     int size = 25;
     int R, G, B;
@@ -329,30 +348,24 @@ void printPoints(int Points) {
     drawText(25, points_x, points_y, R, G, B, pre_rec_msgs[3], true, Points);
 }
 
-void printTime(int mins, int secs, bool time_out) {
+void printTime(int mins, int secs) {
     int size = 25;
     int R, G, B;
     R = G = B = 255;
     int timer_x = start_x + (cell_no + 1) * (cell_size);
     int timer_y = start_y + 2 * (cell_size);
     char temp[50];
-
-    if (time_out == false) {
-        strcpy_s(temp, pre_rec_msgs[2]);
-        drawText(size, timer_x, timer_y, R, G, B, temp);
-        int len = strlen(temp) - 5;
-        temp[len] = mins / 10 + 48;
-        temp[len+1] = mins % 10 + 48;
-        temp[len + 2] = ':';
-        temp[len+3] = secs / 10 + 48;
-        temp[len+4] = secs % 10 + 48;
-        temp[len+5] = '\0';
-        drawText(size, timer_x, timer_y, R, G, B, temp);
-    }
-    else {
-        drawText(size, timer_x, timer_y, R, G, B, pre_rec_msgs[0]);
-        drawText(size, timer_x, timer_y, R, G, B, pre_rec_msgs[4]);
-    }
+    
+    strcpy_s(temp, pre_rec_msgs[2]);
+    drawText(size, timer_x, timer_y, R, G, B, temp);
+    int len = strlen(temp) - 5;
+    temp[len] = mins / 10 + 48;
+    temp[len+1] = mins % 10 + 48;
+    temp[len + 2] = ':';
+    temp[len+3] = secs / 10 + 48;
+    temp[len+4] = secs % 10 + 48;
+    temp[len+5] = '\0';
+    drawText(size, timer_x, timer_y, R, G, B, temp);
 }
 
 bool timer(int& mins, int& secs, bool& updated, bool start_timer = false) {
@@ -382,7 +395,7 @@ bool timer(int& mins, int& secs, bool& updated, bool start_timer = false) {
     }
 
     if (updated == true)
-        printTime(mins, secs, time_out);
+        printTime(mins, secs);
 
     current = std::chrono::high_resolution_clock::now();
 
@@ -410,7 +423,7 @@ void stopwatch(int& mins, int& secs, bool& updated, bool start_timer = false) {
     }
 
     if (updated == true)
-        printTime(mins, secs, false);
+        printTime(mins, secs);
 
     current = std::chrono::high_resolution_clock::now();
 }
@@ -1025,12 +1038,12 @@ void MoveSelectorDown(int& x, int& y, int& cell_x, int& cell_y) {
     }
 }
 
-void game(bool is_timed = true, int mins = 0, int secs = 0, int point_goal = 0, int str_points = 0) {
+void game(bool is_timed = true, bool point_based = false, int mins = 0, int secs = 0, int point_goal = 0, int str_points = 0) {
     
     points = str_points;
 
     int keyboard_key;
-    bool key_pressed, is_selected = false, updated = false, time_out = false;
+    bool key_pressed, is_selected = false, updated = false, time_out = false, goal_reached = false;
     int x = start_x, y = start_y, cell_x = 0, cell_y = 0, selected_x = -1, selected_y = -1;
 
     int cells[cell_no][cell_no] = {};
@@ -1046,9 +1059,9 @@ void game(bool is_timed = true, int mins = 0, int secs = 0, int point_goal = 0, 
     else
         stopwatch(mins, secs, updated, true);
 
-    printTime(mins, secs, time_out);
+    printTime(mins, secs);
 
-    while (time_out == false && (points <= point_goal && is_timed == false)) {
+    while (time_out == false) {
         updateCells(cells);
 
         if (is_timed == true)
@@ -1056,8 +1069,14 @@ void game(bool is_timed = true, int mins = 0, int secs = 0, int point_goal = 0, 
         else
             stopwatch(mins, secs, updated);
 
-        if (updated == true)
+
+        if (updated == true) {
             printPoints(points);
+            if (points >= point_goal && point_based == true) {
+                time_out = true;
+                goal_reached = true;
+            }
+        }
 
         key_pressed = isCursorKeyPressed(keyboard_key);
 
@@ -1108,6 +1127,8 @@ void game(bool is_timed = true, int mins = 0, int secs = 0, int point_goal = 0, 
         }
 
     }
+        
+    game_over(point_based, mins, secs, points, goal_reached);
 
     key_pressed = isCursorKeyPressed(keyboard_key);
     while (!(key_pressed == true && keyboard_key == 7))
@@ -1121,7 +1142,7 @@ int main() {
     system("@echo off");
     system("mode 800");
 
-    game(false, 0, 0, 500);
+    game(true, true, 1, 0, 500);
 
     return 0;
 }
