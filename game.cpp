@@ -17,16 +17,28 @@ int end_y = start_y + cell_no * cell_size;
 int points = 0, Points = 0;
 auto current = std::chrono::high_resolution_clock::now();
 auto printed = current;
-bool isNum = true;
-char pre_rec_msgs[8][50] = { "---------------------------------",   //0
+bool isNum = true, ext = false;
+char pre_rec_msgs[9][50] = { "---------------------------------",   //0
                              "Press Enter to Start!",               //1
                              "Time Remaining: --:--",               //2
                              "Points: ",                            //3
                              "Game Over! Press Escape to Continue!",//4
                              "Congrats! You Scored: ",              //5
                              "You Failed! Better luck next time!",  //6
-                             "Congrats! You reached the goal!"      //7
+                             "Congrats! You reached the goal!",     //7
+                             "Your Goal: "                          //8
 };
+
+
+void menu();
+
+void mode_menu();
+
+void pause_menu();
+
+void time_menu();
+
+int main();
 
 void lettersnNumbers(char chr, int x1, int x2, int y1, int y2, int size, int R = 0, int G = 0, int B = 0) {
     x1 += 5;
@@ -346,6 +358,16 @@ void printPoints(int Points) {
     int points_y = start_y + 3 * (cell_size);
     drawText(25, points_x, points_y, 0, 0, 0, pre_rec_msgs[0]);
     drawText(25, points_x, points_y, R, G, B, pre_rec_msgs[3], true, Points);
+}
+
+void printGoal(int Points) {
+    int size = 25;
+    int R, G, B;
+    R = G = B = 255;
+    int points_x = start_x + (cell_no + 1) * (cell_size);
+    int points_y = start_y + 4 * (cell_size);
+    drawText(25, points_x, points_y, 0, 0, 0, pre_rec_msgs[0]);
+    drawText(25, points_x, points_y, R, G, B, pre_rec_msgs[8], true, Points);
 }
 
 void printTime(int mins, int secs) {
@@ -1038,8 +1060,12 @@ void MoveSelectorDown(int& x, int& y, int& cell_x, int& cell_y) {
     }
 }
 
-void game(bool is_timed = true, bool point_based = false, int mins = 0, int secs = 0, int point_goal = 0, int str_points = 0) {
-    
+bool game(bool is_timed = true, bool point_based = false, int mins = 0, int secs = 0, int point_goal = 0, int str_points = 0) {
+    system("cls");
+
+    if (ext == true)
+        return true;
+
     points = str_points;
 
     int keyboard_key;
@@ -1054,6 +1080,10 @@ void game(bool is_timed = true, bool point_based = false, int mins = 0, int secs
     myRect(x, y, x + cell_size, y + cell_size, 255, 0, 0);
     DrawGems(cells);
     printPoints(points);
+
+    if (point_based == true)
+        printGoal(point_goal);
+
     if (is_timed == true)
         time_out = timer(mins, secs, updated, true);
     else
@@ -1072,6 +1102,8 @@ void game(bool is_timed = true, bool point_based = false, int mins = 0, int secs
 
         if (updated == true) {
             printPoints(points);
+            if (point_based == true)
+                printGoal(point_goal);
             if (points >= point_goal && point_based == true) {
                 time_out = true;
                 goal_reached = true;
@@ -1123,7 +1155,13 @@ void game(bool is_timed = true, bool point_based = false, int mins = 0, int secs
             DrawGems(cells);
         }
         else if (key_pressed == true && keyboard_key == 7) {
-            break;
+            pause_menu();
+            if (ext == true)
+                return false;
+            DrawGrid();
+            selectionAndswapping(cells, cell_x, cell_y, selected_x, selected_y, is_selected);
+            myRect(x, y, x + cell_size, y + cell_size, 255, 0, 0);
+            DrawGems(cells);
         }
 
     }
@@ -1133,16 +1171,328 @@ void game(bool is_timed = true, bool point_based = false, int mins = 0, int secs
     key_pressed = isCursorKeyPressed(keyboard_key);
     while (!(key_pressed == true && keyboard_key == 7))
         key_pressed = isCursorKeyPressed(keyboard_key);
+
+    return goal_reached;
+}
+
+void menu_selection_color(int R[], int G[],int B[], const int option, int selection) {
+    R[selection] = 9;
+    G[selection] = 230;
+    B[selection] = 31;
+
+    for (int i = 0; i < option; i++)
+        if (i != selection)
+            R[i] = G[i] = B[i] = 255;
+}
+
+void print_option(char options[][10], int option, int R[], int G[], int B[]) {
+    int men_str_y = 400, men_end_y = 470, men_str_x = 700, men_end_x = 1050;
+
+    for (int i = 0; i < option; i++) {
+        myRect(men_str_x, men_str_y + 100 * i, men_end_x, men_end_y + 100 * i, R[i], G[i], B[i]);
+        drawText(24, men_str_x + 90, men_str_y + 10 + 100 * i, R[i], G[i], B[i], options[i]);
+    }
+}
+
+void pause_menu() {
+    system("cls");
+
+    if (ext == true)
+        return;
+
+    int corner_x = start_x + cell_size * 25;
+    int corner_y = start_y + cell_size * 11;
+
+    char title[25] = "  Pause Menu";
+    const int option = 2;
+    char options[2][10] = { "Resume", "Exit"};
+    int selection = 0;
+    int R[option], G[option], B[option];
+    int men_str_y = 400, men_end_y = 470, men_str_x = 700, men_end_x = 1050;
+
+    myRect(640, 240, 1110, 320, 30, 92, 250);
+    drawText(30, 650, 250, 30, 92, 250, title);
+
+    myLine(start_x, start_y, corner_x, start_y, 217, 30, 250);
+    myLine(corner_x, start_y, corner_x, corner_y, 217, 30, 250);
+    myLine(corner_x, corner_y, start_x, corner_y, 217, 30, 250);
+    myLine(start_x, corner_y, start_x, start_y, 217, 30, 250);
+
+    int keyboard_key;
+    bool key_pressed = isCursorKeyPressed(keyboard_key);
+
+    menu_selection_color(R, G, B, 2, selection);
+
+    print_option(options, option, R, G, B);
+
+    while (!(key_pressed == true && keyboard_key == 5)) {
+        key_pressed = isCursorKeyPressed(keyboard_key);
+
+        if (key_pressed == true && keyboard_key == 2) {
+            if (selection != 0)
+                selection--;
+
+        }
+
+        else if (key_pressed == true && keyboard_key == 4) {
+            if (selection != option - 1)
+                selection++;
+        }
+
+        menu_selection_color(R, G, B, 2, selection);
+        if (key_pressed == true) {
+            myRect(640, 240, 1110, 320, 30, 92, 250);
+            drawText(30, 650, 250, 30, 92, 250, title);
+
+            myLine(start_x, start_y, corner_x, start_y, 217, 30, 250);
+            myLine(corner_x, start_y, corner_x, corner_y, 217, 30, 250);
+            myLine(corner_x, corner_y, start_x, corner_y, 217, 30, 250);
+            myLine(start_x, corner_y, start_x, start_y, 217, 30, 250);
+            
+            print_option(options, option, R, G, B);
+        }
+    }
+
+    if (selection == 0)
+        system("cls");
+    else if (selection == 1)
+        menu();
+
+    return;
+
+    cin.get();
+}
+
+void mode_menu() {
+    system("cls");
+
+    if (ext == true)
+        return;
+
+    int corner_x = start_x + cell_size * 25;
+    int corner_y = start_y + cell_size * 11;
+
+    myLine(start_x, start_y, corner_x, start_y, 217, 30, 250);
+    myLine(corner_x, start_y, corner_x, corner_y, 217, 30, 250);
+    myLine(corner_x, corner_y, start_x, corner_y, 217, 30, 250);
+    myLine(start_x, corner_y, start_x, start_y, 217, 30, 250);
+
+    char title[25] = "Bejeweled Blitz";
+    const int option = 4;
+    char options[4][10] = { "Sandbox", "Challenge", "Timed", "Back"};
+    int selection = 0;
+    int R[option], G[option], B[option];
+    int men_str_y = 400, men_end_y = 470, men_str_x = 700, men_end_x = 1050;
+
+    myRect(640, 240, 1110, 320, 30, 92, 250);
+    drawText(30, 650, 250, 30, 92, 250, title);
+
+    int keyboard_key;
+    bool key_pressed = isCursorKeyPressed(keyboard_key);
+
+    menu_selection_color(R, G, B, option, selection);
+
+    print_option(options, option, R, G, B);
+
+    while (!(key_pressed == true && keyboard_key == 5)) {
+        key_pressed = isCursorKeyPressed(keyboard_key);
+
+        if (key_pressed == true && keyboard_key == 2) {
+            if (selection != 0)
+                selection--;
+
+        }
+
+        else if (key_pressed == true && keyboard_key == 4) {
+            if (selection != option - 1)
+                selection++;
+        }
+
+        menu_selection_color(R, G, B, option, selection);
+        if (key_pressed == true) {
+
+            myRect(640, 240, 1110, 320, 30, 92, 250);
+            drawText(30, 650, 250, 30, 92, 250, title);
+
+            myLine(start_x, start_y, corner_x, start_y, 217, 30, 250);
+            myLine(corner_x, start_y, corner_x, corner_y, 217, 30, 250);
+            myLine(corner_x, corner_y, start_x, corner_y, 217, 30, 250);
+            myLine(start_x, corner_y, start_x, start_y, 217, 30, 250);
+
+            print_option(options, option, R, G, B);
+        }
+    }
+
+    if (selection == 0)
+        game(false, false);
+    else if (selection == 1) {
+        int min_chal = 1, point_chal = 5000;
+        bool challenge = game(true, true, min_chal, 0, point_chal);
+        while (challenge == true) {
+            min_chal += 1, point_chal += 5000;
+            challenge = game(true, true, min_chal, 0, point_chal);
+        }
+    }
+
+    else if (selection == 2)
+        time_menu();
+    else if (selection == 3)
+        menu();
+
+    cin.get();
+}
+
+void time_menu() {
+    system("cls");
+
+    if (ext == true)
+        return;
+
+    int corner_x = start_x + cell_size * 25;
+    int corner_y = start_y + cell_size * 11;
+
+    myLine(start_x, start_y, corner_x, start_y, 217, 30, 250);
+    myLine(corner_x, start_y, corner_x, corner_y, 217, 30, 250);
+    myLine(corner_x, corner_y, start_x, corner_y, 217, 30, 250);
+    myLine(start_x, corner_y, start_x, start_y, 217, 30, 250);
+
+    char title[25] = "Bejeweled Blitz";
+    const int option = 4;
+    char options[4][10] = { "2 Minutes", "3 Minutes", "5 Minutes", "Back" };
+    int selection = 0;
+    int R[option], G[option], B[option];
+    int men_str_y = 400, men_end_y = 470, men_str_x = 700, men_end_x = 1050;
+
+    myRect(640, 240, 1110, 320, 30, 92, 250);
+    drawText(30, 650, 250, 30, 92, 250, title);
+
+    int keyboard_key;
+    bool key_pressed = isCursorKeyPressed(keyboard_key);
+
+    menu_selection_color(R, G, B, option, selection);
+
+    print_option(options, option, R, G, B);
+
+    while (!(key_pressed == true && keyboard_key == 5)) {
+        key_pressed = isCursorKeyPressed(keyboard_key);
+
+        if (key_pressed == true && keyboard_key == 2) {
+            if (selection != 0)
+                selection--;
+
+        }
+
+        else if (key_pressed == true && keyboard_key == 4) {
+            if (selection != option - 1)
+                selection++;
+        }
+
+        menu_selection_color(R, G, B, option, selection);
+        if (key_pressed == true) {
+
+            myRect(640, 240, 1110, 320, 30, 92, 250);
+            drawText(30, 650, 250, 30, 92, 250, title);
+
+            myLine(start_x, start_y, corner_x, start_y, 217, 30, 250);
+            myLine(corner_x, start_y, corner_x, corner_y, 217, 30, 250);
+            myLine(corner_x, corner_y, start_x, corner_y, 217, 30, 250);
+            myLine(start_x, corner_y, start_x, start_y, 217, 30, 250);
+
+            print_option(options, option, R, G, B);
+        }
+    }
+
+    if (selection == 0)
+        game(true, false, 2, 0);
+    else if (selection == 1)
+        game(true, false, 3, 0);
+    else if (selection == 2)
+        game(true, false, 5, 0);
+    else if (selection == 3)
+        mode_menu();
+
+    cin.get();
+}
+
+void menu() {
+    system("cls");
+
+    if (ext == true)
+        return;
+
+    int corner_x = start_x + cell_size * 25;
+    int corner_y = start_y + cell_size * 11;
+
+    char title[25] = "Bejeweled Blitz";
+    const int option = 2;
+    char options[2][10] = { "Start", "Exit"};
+    int selection = 0;
+    int R[option], G[option], B[option];
+    int men_str_y = 400, men_end_y = 470, men_str_x = 700, men_end_x = 1050;
+
+    myRect(640, 240, 1110, 320, 30, 92, 250);
+    drawText(30, 650, 250, 30, 92, 250, title);
+
+    myLine(start_x, start_y, corner_x, start_y, 217, 30, 250);
+    myLine(corner_x, start_y, corner_x, corner_y, 217, 30, 250);
+    myLine(corner_x, corner_y, start_x, corner_y, 217, 30, 250);
+    myLine(start_x, corner_y, start_x, start_y, 217, 30, 250);
+
+    int keyboard_key;
+    bool key_pressed = isCursorKeyPressed(keyboard_key);
+
+    menu_selection_color(R, G, B, 2, selection);
+
+    print_option(options, option, R, G, B);
+
+    while (!(key_pressed == true && keyboard_key == 5)) {
+        key_pressed = isCursorKeyPressed(keyboard_key);
+
+        if (key_pressed == true && keyboard_key == 2) {
+            if (selection != 0)
+                selection--;
+
+        }
+
+        else if (key_pressed == true && keyboard_key == 4) {
+            if (selection != option - 1)
+                selection++;
+        }
+
+        menu_selection_color(R, G, B, 2, selection);
+        if (key_pressed == true) {
+            myRect(640, 240, 1110, 320, 30, 92, 250);
+            drawText(30, 650, 250, 30, 92, 250, title);
+
+            myLine(start_x, start_y, corner_x, start_y, 217, 30, 250);
+            myLine(corner_x, start_y, corner_x, corner_y, 217, 30, 250);
+            myLine(corner_x, corner_y, start_x, corner_y, 217, 30, 250);
+            myLine(start_x, corner_y, start_x, start_y, 217, 30, 250);
+            
+            print_option(options, option, R, G, B);
+        }
+    }
+
+    if (selection == 0)
+        mode_menu();
+    else if (selection == 1) {
+        ext = true;
+        return;
+    }
+    cin.get();
 }
 
 int main() {
+
+    if (ext == true)
+        return 0;
 
     srand(time(0));
 
     system("@echo off");
     system("mode 800");
 
-    game(true, true, 1, 0, 500);
-
+    //game(true, true, 5, 0, 10000);
+    menu();
     return 0;
 }
