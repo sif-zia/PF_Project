@@ -19,7 +19,7 @@ int hint_x = 0, hint_y = 0;
 auto current = std::chrono::high_resolution_clock::now();
 auto printed = current;
 bool isNum = true, ext = false;
-char pre_rec_msgs[9][50] = { "---------------------------------",   //0
+char pre_rec_msgs[10][50] = { "---------------------------------",   //0
                              "Press Enter to Start!",               //1
                              "Time Remaining: --:--",               //2
                              "Points: ",                            //3
@@ -27,9 +27,10 @@ char pre_rec_msgs[9][50] = { "---------------------------------",   //0
                              "Congrats! You Scored: ",              //5
                              "You Failed! Better luck next time!",  //6
                              "Congrats! You reached the goal!",     //7
-                             "Your Goal: "                          //8
+                             "Your Goal: ",                         //8
+                             "Time: --:--"                          //9 
 };
-
+// These are few function
 void menu();
 
 void mode_menu();
@@ -370,15 +371,19 @@ void printGoal(int Points) {
     drawText(25, points_x, points_y, R, G, B, pre_rec_msgs[8], true, Points);
 }
 
-void printTime(int mins, int secs) {
+void printTime(int mins, int secs, bool stopwatch = false) {
     int size = 25;
     int R, G, B;
     R = G = B = 255;
     int timer_x = start_x + (cell_no + 1) * (cell_size);
     int timer_y = start_y + 2 * (cell_size);
     char temp[50];
-    
-    strcpy_s(temp, pre_rec_msgs[2]);
+
+    if(stopwatch == false)
+        strcpy_s(temp, pre_rec_msgs[2]);
+    else
+        strcpy_s(temp, pre_rec_msgs[9]);
+
     drawText(size, timer_x, timer_y, R, G, B, temp);
     int len = strlen(temp) - 5;
     temp[len] = mins / 10 + 48;
@@ -449,7 +454,7 @@ void stopwatch(int& mins, int& secs, bool& updated, bool start_timer = false) {
     }
 
     if (updated == true)
-        printTime(mins, secs);
+        printTime(mins, secs, true);
 
     current = std::chrono::high_resolution_clock::now();
 }
@@ -1162,6 +1167,7 @@ bool hint(int cells[cell_no][cell_no], bool movement = false) {
 }
 
 bool game(bool is_timed = true, bool point_based = false, int mins = 0, int secs = 0, int point_goal = 0, int str_points = 0) {
+    idle_tick = 0;
     myRect(50, 100, 1810, 880, 0, 0, 0);
 
     if (ext == true)
@@ -1177,7 +1183,6 @@ bool game(bool is_timed = true, bool point_based = false, int mins = 0, int secs
     int cells[cell_no][cell_no] = {};
 
     randomizer(cells);
-    DrawGems(cells);
     DrawGrid();
     myRect(x, y, x + cell_size, y + cell_size, 255, 0, 0);
     DrawGems(cells);
@@ -1186,12 +1191,15 @@ bool game(bool is_timed = true, bool point_based = false, int mins = 0, int secs
     if (point_based == true)
         printGoal(point_goal);
 
-    if (is_timed == true)
+    if (is_timed == true) {
         time_out = timer(mins, secs, updated, true);
-    else
+        printTime(mins, secs);
+    }
+    else {
         stopwatch(mins, secs, updated, true);
+        printTime(mins, secs, true);
+    }
 
-    printTime(mins, secs);
 
     while (time_out == false) {
         updateCells(cells);
@@ -1228,9 +1236,6 @@ bool game(bool is_timed = true, bool point_based = false, int mins = 0, int secs
         }
         else if (key_pressed == true && keyboard_key == 5) {
             selectionAndswapping(cells, cell_x, cell_y, selected_x, selected_y, is_selected, true);
-        }
-        else if (key_pressed == true && keyboard_key == 6) {
-            randomizer(cells);
         }
         else if (key_pressed == true && keyboard_key == 7) {
             pause_menu();
