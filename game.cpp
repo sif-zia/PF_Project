@@ -5,20 +5,31 @@
 #include <ctime>
 #include <chrono>
 using namespace std;
-
+//These are few global variables shared by many functions
+//Following two variables decide the position of grid
 int start_x = 50;
 int start_y = 100;
+//This variable decide the cell size
 int cell_size = 70;
+//This variable decide the cell number
 const int cell_no = 8;
+//This variable decide the speed of the animation
 const int speed = 25;
+//This variable calculates the end position of grid
 int end_x = start_x + cell_no * cell_size;
 int end_y = start_y + cell_no * cell_size;
-int points = 0, Points = 0;
+//This variable records the points of player
+int points = 0;
+//This variable records the time for which there is no combo made
 int idle_tick = 0;
+//This variable stores the indexes of hint
 int hint_x = 0, hint_y = 0;
+//This records the current time
 auto current = std::chrono::high_resolution_clock::now();
 auto printed = current;
-bool isNum = true, ext = false;
+//This variable is use to exit the game
+bool ext = false;
+//This variable stores all the cstrings which are frequently used
 char pre_rec_msgs[10][50] = { "---------------------------------",   //0
                              "Press Enter to Start!",               //1
                              "Time Remaining: --:--",               //2
@@ -30,7 +41,7 @@ char pre_rec_msgs[10][50] = { "---------------------------------",   //0
                              "Your Goal: ",                         //8
                              "Time: --:--"                          //9 
 };
-// These are few function
+// These are few function prototypes
 void menu();
 
 void mode_menu();
@@ -40,7 +51,7 @@ void pause_menu();
 void time_menu();
 
 bool hint(int cells[cell_no][cell_no], bool movement);
-
+//This Function Draws a single letter on screen
 void lettersnNumbers(char chr, int x1, int x2, int y1, int y2, int size, int R = 0, int G = 0, int B = 0) {
     x1 += 5;
     x2 -= 5;
@@ -282,13 +293,13 @@ void lettersnNumbers(char chr, int x1, int x2, int y1, int y2, int size, int R =
     else if (chr == '-')
         myRect(x1-5, y1-5, x2+5, y2+5, 0, 0, 0);
 }
-
+//This Function Converts a Cstring to uppercase
 void Capitalizer(char text[]) {
     for (int i = 0; i < strlen(text); i++)
         if (text[i] >= 'a' && text[i] <= 'z')
             text[i] -= 32;
 }
-
+//This Function to print Text on Screen
 void drawText(int size, int start_x, int start_y, int R, int G, int B, char text[], bool isNum = false, int num = 0) {
     int idx = 0;
     int idx_x = 0;
@@ -299,6 +310,7 @@ void drawText(int size, int start_x, int start_y, int R, int G, int B, char text
     char temp[100];
 
     strcpy_s(temp, text);
+    //If this function takes a number to print then he converts the number into atring using following loop
     if (isNum == true) {
         int reverse_num = 0;
         int i;
@@ -311,9 +323,9 @@ void drawText(int size, int start_x, int start_y, int R, int G, int B, char text
 
         temp[i] = '\0';
     }
-
+    //Now the cstring is converted into upper case letters
     Capitalizer(temp);
-
+    //This loop prints each individual letter on the screen
     for (idx = 0; idx < strlen(temp); idx++)
     {
         x1 = start_x + size * idx_x;
@@ -334,13 +346,15 @@ void drawText(int size, int start_x, int start_y, int R, int G, int B, char text
     }
 
 }
-
+//This function is called when the game is completed to print final points
 void game_over(bool point_based, int mins, int secs, int points, bool goal_reached = false) {
     myRect(50, 100, 1810, 880, 0, 0, 0);
+    //If the game mode is not point limited then it will print the points
     if (point_based == false) {
         drawText(35, 200, 200, 100, 100, 255, pre_rec_msgs[5], true, points);
         drawText(25, 200, 300, 100, 100, 255, pre_rec_msgs[4]);
-    }
+    }// else if the game mode has a point target then this function checks if the target is completed or not and prints
+    // a message accordingly
     else if (point_based == true && goal_reached == false) {
         drawText(35, 200, 200, 255, 100, 100, pre_rec_msgs[6]);
         drawText(25, 200, 300, 255, 100, 100, pre_rec_msgs[4]);
@@ -350,7 +364,7 @@ void game_over(bool point_based, int mins, int secs, int points, bool goal_reach
         drawText(25, 200, 300, 100, 255, 100, pre_rec_msgs[4]);
     }
 }
-
+//This function is used to print points on screen
 void printPoints(int Points) {
     int size = 25;
     int R, G, B;
@@ -360,7 +374,7 @@ void printPoints(int Points) {
     drawText(25, points_x, points_y, 0, 0, 0, pre_rec_msgs[0]);
     drawText(25, points_x, points_y, R, G, B, pre_rec_msgs[3], true, Points);
 }
-
+//This function is use to print the point goal on screen
 void printGoal(int Points) {
     int size = 25;
     int R, G, B;
@@ -370,7 +384,7 @@ void printGoal(int Points) {
     drawText(25, points_x, points_y, 0, 0, 0, pre_rec_msgs[0]);
     drawText(25, points_x, points_y, R, G, B, pre_rec_msgs[8], true, Points);
 }
-
+//This function is use to print the time on screen
 void printTime(int mins, int secs, bool stopwatch = false) {
     int size = 25;
     int R, G, B;
@@ -383,7 +397,7 @@ void printTime(int mins, int secs, bool stopwatch = false) {
         strcpy_s(temp, pre_rec_msgs[2]);
     else
         strcpy_s(temp, pre_rec_msgs[9]);
-
+    //Following statement is used to convert mins and secs into a cstring
     drawText(size, timer_x, timer_y, R, G, B, temp);
     int len = strlen(temp) - 5;
     temp[len] = mins / 10 + 48;
@@ -394,7 +408,7 @@ void printTime(int mins, int secs, bool stopwatch = false) {
     temp[len+5] = '\0';
     drawText(size, timer_x, timer_y, R, G, B, temp);
 }
-
+//This function updates the time by decrementing
 bool timer(int& mins, int& secs, bool& updated, bool start_timer = false) {
     bool time_out = false;
 
@@ -430,7 +444,7 @@ bool timer(int& mins, int& secs, bool& updated, bool start_timer = false) {
 
     return time_out;
 }
-
+//This function updates the time by incrementing
 void stopwatch(int& mins, int& secs, bool& updated, bool start_timer = false) {
 
     if (updated == true)
@@ -444,21 +458,21 @@ void stopwatch(int& mins, int& secs, bool& updated, bool start_timer = false) {
     if (time_passed.count() >= 1) { // When one second has passed execute the following condition
 
         secs++;
-        if (secs == 60)
+        if (secs == 60) // If 60 secs are completed increment the mins by 1 and start secs from 0
             mins++, secs = 0;
 
-        idle_tick++;
+        idle_tick++; //increment the idle time
 
         printed = current;
         updated = true;
     }
 
-    if (updated == true)
+    if (updated == true) // print the mins and secs
         printTime(mins, secs, true);
 
     current = std::chrono::high_resolution_clock::now();
 }
-
+//This function draws a grid
 void DrawGrid() {
 
     //Vertical lines
@@ -469,9 +483,9 @@ void DrawGrid() {
     for (int y = start_y; y <= end_y; y += cell_size)
         myLine(start_x, y, end_x, y, 255);
 }
-
+//This Function deletes all gems from the cells array
 void EmptyCells(int cells[cell_no][cell_no]) {
-
+    // This loops deletes all the normal cells
     for (int i = 0; i < cell_no; i++) {
         for (int j = 0; j < cell_no; j++) {
             if (cells[i][j] < 6)
@@ -480,7 +494,7 @@ void EmptyCells(int cells[cell_no][cell_no]) {
     }
 
 }
-
+//This function prints a single gem
 void gem(int cell, int i, int j) {
 
     int size = cell_size/4;
@@ -615,9 +629,9 @@ void gem(int cell, int i, int j) {
         myLine(mid_x - size, mid_y, mid_x + size, mid_y, 0, 255, 0);
     }
 }
-
+//This function draws all the gems
 void DrawGems(int cells[cell_no][cell_no]) {
-
+    //This loop draw each individual gem one by one
     for (int i = 0; i < cell_no; i++) {
         for (int j = 0; j < cell_no; j++) {
             gem(cells[i][j], i, j);
@@ -625,9 +639,10 @@ void DrawGems(int cells[cell_no][cell_no]) {
     }
     
 }
-
+//This function is used to check if a number generated using randomizer is similar to its neighbours
 bool isGeneratedDuplicates(int cells[cell_no][cell_no], int i, int j) {
     bool flag = false;
+    //these conditions matches a gem with its neighbours
     if (i != 0 && cells[i][j] == cells[i - 1][j])
         flag = true;
     if (j != 0 && cells[i][j] == cells[i][j - 1])
@@ -638,10 +653,11 @@ bool isGeneratedDuplicates(int cells[cell_no][cell_no], int i, int j) {
         flag = true;
     return flag;
 }
-
+//This function randomizes the array
 void randomizer(int cells[cell_no][cell_no]) {
     EmptyCells(cells);
     DrawGems(cells);
+    //this loop randomizes all the normal gems untill they are not same as there neighbours
     for (int i = 0; i < cell_no; i++) {
         for (int j = 0; j < cell_no; j++) {
             if (cells[i][j] == 0) {
@@ -653,9 +669,10 @@ void randomizer(int cells[cell_no][cell_no]) {
         }
     }
 }
-
+//This function checks if two gems are neighbours
 bool isNeighbour(int selected_x, int selected_y, int cell_x, int cell_y) {
     bool flag = false;
+    //these conditions check if two gems which are being swapped are next to each other or not
     if ((selected_x - cell_x == 1) && (selected_y == cell_y))
         flag = true;
     else if ((cell_x - selected_x == 1) && (selected_y == cell_y))
@@ -666,19 +683,22 @@ bool isNeighbour(int selected_x, int selected_y, int cell_x, int cell_y) {
         flag = true;
     return flag;
 }
-
+//This function matches two gems
 bool areGemsSame(int gem1, int gem2) {
     bool samegem = false;
+    // this condition check if two gems are of same type
     if(gem1 != 0 && gem1 != 6 && gem1 != 12 && gem1 % 6 == gem2 % 6)
         samegem = true;
     return samegem;
 }
-
+//This function checks if any combination is made after swapping if so it returns true else false
 bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y, int  cell_x, int cell_y) {
     int count = 1;
     bool shouldSwap = false;
+    //swapping the selected gems
     swap(cells[selected_x][selected_y], cells[cell_x][cell_y]);
-    if (selected_y == cell_y) {
+    //following code is used to check if any combos are made after swapping
+    if (selected_y == cell_y) { // this condition checks if swapped gems are on the same row
         // Checking column for atleast three consecutive duplicates
         for (int i = 1; i < cell_no; i++) {
             if (areGemsSame(cells[i][cell_y], cells[i - 1][cell_y]) == true) {
@@ -712,7 +732,7 @@ bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y
                 count = 1;
         }
 
-    }
+    } // this condition checks if swapped gems are on the same column
     else if (selected_x == cell_x) {
         // Checking column for atleast three consecutive duplicates
         for (int j = 1; j < cell_no; j++) {
@@ -724,7 +744,6 @@ bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y
             else
                 count = 1;
         }
-        
         count = 1;
         // Checking cell_y row for atleast three consecutive duplicates
         for (int j = 1; j < cell_no; j++) {
@@ -751,7 +770,7 @@ bool isSwappingLegal(int cells[cell_no][cell_no], int selected_x, int selected_y
     swap(cells[selected_x][selected_y], cells[cell_x][cell_y]);
     return shouldSwap;
 }
-
+//This function delete a single cell
 void deleteCell(int cells[cell_no][cell_no], int i, int j) {
     if (cells[i][j] >= 0 && cells[i][j] <= 6 || cells[i][j] == 12)
         cells[i][j] = 0;
@@ -760,7 +779,7 @@ void deleteCell(int cells[cell_no][cell_no], int i, int j) {
     else if (cells[i][j] > 12 && cells[i][j] < 18)
         cells[i][j] = 12;
 }
-
+//This function delete a single gem
 void deleteGem(int cells[cell_no][cell_no], int i, int j) {
     if (cells[i][j] >= 0 && cells[i][j] < 6)
         cells[i][j] = 0;
@@ -770,8 +789,9 @@ void deleteGem(int cells[cell_no][cell_no], int i, int j) {
         cells[i][j] = 12;
 
 }
-
+//This function deletes an area of 3x3
 void initiateFlameGem(int cells[cell_no][cell_no], int& pos_x, int& pos_y) {
+    Beep(400, 3 * speed);
     deleteCell(cells, pos_x, pos_y);
     for (int i = pos_x - 1; i <= pos_x + 1; i++)
         for (int j = pos_y - 1; j <= pos_y + 1; j++) {
@@ -785,9 +805,9 @@ void initiateFlameGem(int cells[cell_no][cell_no], int& pos_x, int& pos_y) {
         pos_x--;
     pos_y = cell_no - 1;
 }
-
+//This function deletes a whole column and a row
 void initiateDestroyerGem(int cells[cell_no][cell_no], int& pos_x, int& pos_y) {
-
+    Beep(400, 3 * speed);
     deleteCell(cells, pos_x, pos_y);
     for (int x = 0; x < cell_no; x++) {
         Sleep(speed / 2);
@@ -803,25 +823,25 @@ void initiateDestroyerGem(int cells[cell_no][cell_no], int& pos_x, int& pos_y) {
     pos_x = 0;
     pos_y = cell_no - 1;
 }
-
+//This function acts as gravity
 void shiftGemsDown(int cells[cell_no][cell_no], int pos_x, int pos_y) {
-    // Add animation in future
+    // this loop bring cells down
     for (int i = pos_y; i >= 1; i--) {
         Sleep(speed);
         cells[pos_x][i] = cells[pos_x][i - 1];
         gem(cells[pos_x][i], pos_x, i);
         gem(0, pos_x, i - 1);
     }
-
+    // this code fill the topmost cell
     gem(0, pos_x, 0);
     cells[pos_x][0] = (rand() % 5) + 1;
     while (isGeneratedDuplicates(cells, pos_x, 0) == true)
         cells[pos_x][0] = (rand() % 5) + 1;
     gem(cells[pos_x][0], pos_x, 0);
 }
-
+//This function deals with empty cells
 void fillEmptyCells(int cells[cell_no][cell_no]) {
-
+    //these loop checks if any special gem was deleted and take actions accordingly
     for (int pos_x = 0; pos_x < cell_no; pos_x++) {
         for (int pos_y = cell_no - 1; pos_y >= 0; pos_y--) {
             if (cells[pos_x][pos_y] == 6)
@@ -830,15 +850,16 @@ void fillEmptyCells(int cells[cell_no][cell_no]) {
                 initiateDestroyerGem(cells, pos_x, pos_y);
         }
     }
-
+    //this loop finds empty cells and implements gravity onto them
     for (int pos_x = 0; pos_x < cell_no; pos_x++)
         for (int pos_y = cell_no - 1; pos_y >= 0; pos_y--)
             if (cells[pos_x][pos_y] == 0)
                 shiftGemsDown(cells, pos_x, pos_y);
 }
-
+//This function finds an elbow for destroyer gem
 bool isElbowFormed(int cells[cell_no][cell_no], int x, int y, int& elbow_x, int& elbow_y) {
     bool elbowfound = false;
+    // following code is for all the conditons in which an ellbow can be made
     for (int i = y; i >= y - 2; i--) {
         if (areGemsSame(cells[x][i], cells[x + 1][i]) == true && areGemsSame(cells[x + 1][i], cells[x + 2][i]) == true) {
             elbowfound = true;
@@ -884,7 +905,7 @@ bool isElbowFormed(int cells[cell_no][cell_no], int x, int y, int& elbow_x, int&
     }
     return elbowfound;
 }
-
+//This function checks for all the combination in a column
 void deleteColDuplicate(int cells[cell_no][cell_no], int col) {
     int count = 1;
     int elbow_x, elbow_y;
@@ -895,14 +916,15 @@ void deleteColDuplicate(int cells[cell_no][cell_no], int col) {
         else {
             if (count == 3) { // Delete Three Consective Gems in a column
                 hint(cells, true);
-                if (isElbowFormed(cells, col, y - 1, elbow_x, elbow_y) == true) {
+                Beep(1000, 2 * speed);
+                if (isElbowFormed(cells, col, y - 1, elbow_x, elbow_y) == true) {// check for elbow
                     Gem = cells[elbow_x][elbow_y];
-                    for (int i = 1; i <= 3; i++) {
+                    for (int i = 1; i <= 3; i++) {// delete all the ellbow gems
                         gem(0, col, y - i);
                         deleteCell(cells, col, y - i);
                         points += 50;
                     }
-                    if(Gem < 6)
+                    if(Gem < 6) // convert normal gem into destroyer gem
                         cells[elbow_x][elbow_y] = Gem + 12;
                     else {
                         Gem %= 6;
@@ -920,9 +942,10 @@ void deleteColDuplicate(int cells[cell_no][cell_no], int col) {
             }
             else if (count >= 4) { // Delete Four or more Consective Gems in a row and adding a flame gem
                 hint(cells, true);
+                Beep(1000, 2 * speed);
                 bool flame_inserted = false;
                 for (int i = 1; i <= count; i++) {
-                    if (cells[col][y - i] < 6 && flame_inserted == false) {
+                    if (cells[col][y - i] < 6 && flame_inserted == false) { // find a place to insert special gem
                         gem(0, col, y - i);
                         cells[col][y - i] %= 6;
                         cells[col][y - i] += 6;
@@ -941,7 +964,7 @@ void deleteColDuplicate(int cells[cell_no][cell_no], int col) {
         }
     }
 }
-
+//This function checks for all the combination in a row
 void deleteRowDuplicate(int cells[cell_no][cell_no], int row) {
     int count = 1;
     for (int x = 1; x <= cell_no; x++) {
@@ -950,6 +973,7 @@ void deleteRowDuplicate(int cells[cell_no][cell_no], int row) {
         else {
             if (count == 3) { // Delete Three Consective Gems in a row
                 hint(cells, true);
+                Beep(1000, 2 * speed);
                 for (int i = 1; i <= 3; i++) {
                     gem(0, x - i, row);
                     deleteCell(cells, x - i, row);
@@ -958,6 +982,7 @@ void deleteRowDuplicate(int cells[cell_no][cell_no], int row) {
             }
             else if (count >= 4) {// Delete Four or more Consective Gems in a row and adding a flame gem
                 hint(cells, true);
+                Beep(1000, 2 * speed);
                 bool flame_inserted = false;
                 for (int i = 1; i <= count; i++) {
                     if (cells[x - i][row] < 6 && flame_inserted == false) {
@@ -979,16 +1004,17 @@ void deleteRowDuplicate(int cells[cell_no][cell_no], int row) {
         }
     }
 }
-
+//This function checks if there is any empty cells in the cells array
 bool AnyEmptyCell(int cells[cell_no][cell_no]) {
     bool emptyCell = false;
+    //following loop finds any empty cell
     for (int i = 0; i < cell_no; i++)
         for (int j = 0; j < cell_no; j++)
             if (cells[i][j] == 0 || cells[i][j] == 6 || cells[i][j] == 12)
                 emptyCell = true;
     return emptyCell;
 }
-
+//This function deals with all the possible combinations 
 void deleteDuplicates(int cells[cell_no][cell_no]) {
     for (int col = 0; col < cell_no; col++)
         deleteColDuplicate(cells, col);
@@ -996,21 +1022,21 @@ void deleteDuplicates(int cells[cell_no][cell_no]) {
         deleteRowDuplicate(cells, row);
     
 }
-
+//This function first find combinations then deletes them and then fill there place
 void updateCells(int cells[cell_no][cell_no]) {
     if(AnyEmptyCell(cells) == false)
         deleteDuplicates(cells);
     fillEmptyCells(cells);
 }
-
+//This function manages the swapping mechanism
 void selectionAndswapping(int cells[cell_no][cell_no], int cell_x, int cell_y, int& selected_x, int& selected_y, bool& is_selected, bool enter = false) {
     bool shouldSwap = isNeighbour(selected_x, selected_y, cell_x, cell_y);
-
+    // is no box is already selected and enter key is pressed select the current box
     if (is_selected == false && enter == true) {
         selected_x = cell_x;
         selected_y = cell_y;
         is_selected = true;
-    }
+    }// if a cell is already selected and enter key is pressed then swap them if llegal
     else if (is_selected == true && enter == true && shouldSwap == true) {
         if (isSwappingLegal(cells, selected_x, selected_y, cell_x, cell_y) == true) {
             gem(0, selected_x, selected_y);
@@ -1024,7 +1050,7 @@ void selectionAndswapping(int cells[cell_no][cell_no], int cell_x, int cell_y, i
         int green_x = start_x + selected_x * (cell_size);
         int green_y = start_y + selected_y * (cell_size);
         myRect(green_x, green_y, green_x + cell_size, green_y + cell_size, 255, 255, 255); //Draws White box to remove green box
-    }
+    }// if selected elements are far apart then select the current cell
     else if (is_selected == true && enter == true && shouldSwap == false) {
         int green_x = start_x + selected_x * (cell_size);
         int green_y = start_y + selected_y * (cell_size);
@@ -1032,7 +1058,7 @@ void selectionAndswapping(int cells[cell_no][cell_no], int cell_x, int cell_y, i
         selected_x = cell_x;
         selected_y = cell_y;
     }
-
+    //print the green box
     if (is_selected == true) {
         int green_x = start_x + selected_x * (cell_size);
         int green_y = start_y + selected_y * (cell_size);
@@ -1040,8 +1066,9 @@ void selectionAndswapping(int cells[cell_no][cell_no], int cell_x, int cell_y, i
     }
 
 }
-
+//Following four functions controls the movement of the cursor
 void MoveSelectorLeft(int& x, int& y, int& cell_x, int& cell_y) {
+    Beep(700, 2*speed);
     if (x != start_x) {
         myRect(x, y, x + cell_size, y + cell_size, 255, 255, 255);
         cell_x--;
@@ -1050,6 +1077,7 @@ void MoveSelectorLeft(int& x, int& y, int& cell_x, int& cell_y) {
 }
 
 void MoveSelectorRight(int& x, int& y, int& cell_x, int& cell_y) {
+    Beep(700, 2 * speed);
     if (x + cell_size != end_x) {
         myRect(x, y, x + cell_size, y + cell_size, 255, 255, 255);
         cell_x++;
@@ -1058,6 +1086,7 @@ void MoveSelectorRight(int& x, int& y, int& cell_x, int& cell_y) {
 }
 
 void MoveSelectorUp(int& x, int& y, int& cell_x, int& cell_y) {
+    Beep(700, 2 * speed);
     if (y != start_y) {
         myRect(x, y, x + cell_size, y + cell_size, 255, 255, 255);
         cell_y--;
@@ -1066,13 +1095,14 @@ void MoveSelectorUp(int& x, int& y, int& cell_x, int& cell_y) {
 }
 
 void MoveSelectorDown(int& x, int& y, int& cell_x, int& cell_y) {
+    Beep(700, 2 * speed);
     if (y + cell_size != end_y) {
         myRect(x, y, x + cell_size, y + cell_size, 255, 255, 255);
         cell_y++;
         y += cell_size;
     }
 }
-
+//This function looks for hints in a row
 bool hint_row(int cells[cell_no][cell_no], int y) {
     bool hint_found = false;
 
@@ -1103,7 +1133,7 @@ bool hint_row(int cells[cell_no][cell_no], int y) {
     }
     return hint_found;
 }
-
+//This function looks for hint in a column
 bool hint_col(int cells[cell_no][cell_no], int x) {
     bool hint_found = false;
     for (int y = 1; y < cell_no && hint_found == false; y++) {
@@ -1133,7 +1163,7 @@ bool hint_col(int cells[cell_no][cell_no], int x) {
     }
     return hint_found;
 }
-
+//This function find hints in all the array cell
 bool find_hint(int cells[cell_no][cell_no]){
     bool r = false, c = false;
 
@@ -1144,7 +1174,7 @@ bool find_hint(int cells[cell_no][cell_no]){
     
     return (r || c);
 }
-
+//This function prints the hint and calls the above three functions
 bool hint(int cells[cell_no][cell_no], bool movement = false) {
     bool hint_found = false;
     if (movement == true) {
@@ -1165,7 +1195,7 @@ bool hint(int cells[cell_no][cell_no], bool movement = false) {
     }
     return hint_found;
 }
-
+//This function holds the main game
 bool game(bool is_timed = true, bool point_based = false, int mins = 0, int secs = 0, int point_goal = 0, int str_points = 0) {
     idle_tick = 0;
     myRect(50, 100, 1810, 880, 0, 0, 0);
@@ -1274,7 +1304,7 @@ bool game(bool is_timed = true, bool point_based = false, int mins = 0, int secs
 
     return false;
 }
-
+//This function changes colour of options in a menu depending on the selected option
 void menu_selection_color(int R[], int G[],int B[], const int option, int selection) {
     R[selection] = 9;
     G[selection] = 230;
@@ -1284,7 +1314,7 @@ void menu_selection_color(int R[], int G[],int B[], const int option, int select
         if (i != selection)
             R[i] = G[i] = B[i] = 255;
 }
-
+//This function print all the options in a menu
 void print_option(char options[][10], int option, int R[], int G[], int B[]) {
     int men_str_y = 400, men_end_y = 470, men_str_x = 700, men_end_x = 1050;
 
@@ -1293,7 +1323,7 @@ void print_option(char options[][10], int option, int R[], int G[], int B[]) {
         drawText(24, men_str_x + 10, men_str_y + 10 + 100 * i, R[i], G[i], B[i], options[i]);
     }
 }
-
+//This function prints the whole menu
 int print_menu(const int option, char options[][10], char title[], int R[], int G[], int B[]) {
 
     myRect(50, 100, 1810, 880, 0, 0, 0);
@@ -1339,6 +1369,7 @@ int print_menu(const int option, char options[][10], char title[], int R[], int 
         }
         menu_selection_color(R, G, B, option, selection);
         if (key_pressed == true) {
+            Beep(700, 2 * speed);
             myRect(640, 240, 1110, 320, 30, 92, 250);
             drawText(30, 650, 250, 30, 92, 250, title);
 
@@ -1354,7 +1385,7 @@ int print_menu(const int option, char options[][10], char title[], int R[], int 
     
     return selection;
 }
-
+//Follwing functions are different menus
 void pause_menu() {
 
     if (ext == true)
@@ -1452,9 +1483,6 @@ void menu() {
 }
 
 int main() {
-
-    if (ext == true)
-        return 0;
 
     srand(time(0));
 
